@@ -323,7 +323,7 @@ function miniAvatarDiv(member) {
 }
 
 function cbNum(n, sign = '') {
-  return `${sign}${n} <span class="cb-mark" style="font-size:0.75em">ᴄʙ</span>`;
+  return `${sign}${n}<span class="cb-mark" style="font-size:10px;letter-spacing:-0.5px;margin-left:1px;vertical-align:1px">ᴄʙ</span>`;
 }
 
 function renderAll() {
@@ -384,7 +384,6 @@ function renderFeed() {
           <div class="feed-desc">${item.desc}</div>
           <div class="feed-meta">
             <span class="type-badge ${BADGE[item.type] || 'badge-system'}">${item.type}</span>
-            <span class="feed-meta-names">${fromM.name} → ${toM.name}</span>
             <span class="feed-meta-time">${item.time}</span>
           </div>
         </div>
