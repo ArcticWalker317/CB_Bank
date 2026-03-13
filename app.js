@@ -686,7 +686,7 @@ function openAvatarEditModal() {
       me.avatar = dataURL;
       saveToGist();
       closeModal();
-      renderProfile();
+      renderAll();
     });
   });
 
@@ -696,7 +696,7 @@ function openAvatarEditModal() {
       me.avatar = null;
       saveToGist();
       closeModal();
-      renderProfile();
+      renderAll();
     });
   });
 }
