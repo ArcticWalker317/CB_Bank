@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ᴄʙ Bank">
+  <meta name="theme-color" content="#0A0A0A">
+  <title>ᴄʙ Bank</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ══ FEED TAB ══ -->
+    <section id="tab-feed" class="tab-pane active">
+      <header class="page-header">
+        <h1 class="header-title"><span class="cb-mark">ᴄʙ</span> Bank</h1>
+        <button class="btn-ghost" id="btnSend">Send ᴄʙ</button>
+      </header>
+      <div id="members-strip" class="members-strip"></div>
+      <div id="feed-list" class="feed-list"></div>
+    </section>
+
+    <!-- ══ MARKETPLACE TAB ══ -->
+    <section id="tab-marketplace" class="tab-pane">
+
+      <div id="mkt-home">
+        <header class="page-header">
+          <h1 class="header-title">Marketplace</h1>
+        </header>
+        <div class="mkt-scroll-area">
+          <div id="mkt-grid" class="mkt-grid"></div>
+          <div class="fab-wrap">
+            <button class="fab" id="btnCreate">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="mkt-list" class="hidden">
+        <header class="page-header">
+          <button class="btn-back" id="btnBack">
+            <svg width="10" height="17" viewBox="0 0 10 17" fill="none">
+              <path d="M9 1L1 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h1 class="header-title" id="list-title">Bounties</h1>
+          <div class="header-spacer"></div>
+        </header>
+        <div id="mkt-items" class="mkt-items"></div>
+        <div class="fab-float">
+          <button class="fab" id="btnCreateList">+</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══ PROFILE TAB ══ -->
+    <section id="tab-profile" class="tab-pane">
+      <header class="page-header">
+        <h1 class="header-title">Profile</h1>
+      </header>
+      <div id="profile-body" class="profile-body"></div>
+    </section>
+
+    <!-- ══ BOTTOM NAV ══ -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="feed">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 12h4M3 7h7M3 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 17l3 4 3-8 3 4 2-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Feed</span>
+      </button>
+      <button class="nav-item" data-tab="marketplace">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="13" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="3" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="13" y="13" width="8" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span>Market</span>
+      </button>
+      <button class="nav-item" data-tab="profile">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+
+    <!-- ══ MODAL ══ -->
+    <div id="modal-overlay" class="modal-overlay" aria-hidden="true">
+      <div class="modal-sheet" id="modal-sheet">
+        <div class="modal-handle"></div>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
