@@ -102,18 +102,18 @@ const DEFAULT_DATA = {
     ],
   },
   balanceHistory: {
-     1: [32, 28, 40, 35, 44, 42, 47],
-     2: [10, 15, 12, 20, 18, 23, 23],
-     3: [10, 10, 10, 10, 10, 10, 10],
-     4: [40, 45, 50, 55, 58, 60, 61],
-     5: [10, 10, 10, 10, 10, 10, 10],
-     6: [15, 20, 25, 28, 30, 29, 29],
-     7: [10, 10, 15, 12, 18, 18, 18],
-     8: [20, 25, 30, 28, 32, 35, 35],
-     9: [10, 10, 10, 10, 10, 10, 10],
-    10: [10, 10, 10, 10, 10, 10, 10],
-    11: [10, 10, 10, 10, 10, 10, 10],
-    12: [30, 35, 38, 40, 42, 42, 42],
+     1: { week: [32,28,40,35,44,42,47],      month: [22,30,38,47],           year: [10,12,15,18,22,26,30,34,38,42,45,47],  allTime: [0,5,10,18,28,38,47]   },
+     2: { week: [10,15,12,20,18,23,23],      month: [10,14,18,23],           year: [0,2,4,6,8,10,12,14,16,18,21,23],       allTime: [0,5,10,15,20,23]       },
+     3: { week: [10,10,10,10,10,10,10],      month: [10,10,10,10],           year: [0,2,4,6,8,10,10,10,10,10,10,10],       allTime: [0,5,10,10]             },
+     4: { week: [40,45,50,55,58,60,61],      month: [30,42,54,61],           year: [10,14,18,22,28,32,38,44,50,55,59,61],  allTime: [0,10,20,35,50,61]      },
+     5: { week: [10,10,10,10,10,10,10],      month: [10,10,10,10],           year: [0,2,4,6,8,10,10,10,10,10,10,10],       allTime: [0,5,10,10]             },
+     6: { week: [15,20,25,28,30,29,29],      month: [18,22,27,29],           year: [0,2,5,8,12,16,20,24,26,28,29,29],      allTime: [0,5,12,20,28,29]       },
+     7: { week: [10,10,15,12,18,18,18],      month: [10,12,15,18],           year: [0,2,4,6,8,10,11,12,14,16,17,18],       allTime: [0,5,8,12,16,18]        },
+     8: { week: [20,25,30,28,32,35,35],      month: [18,24,30,35],           year: [0,3,6,10,14,18,22,26,28,30,33,35],     allTime: [0,8,15,22,30,35]       },
+     9: { week: [10,10,10,10,10,10,10],      month: [10,10,10,10],           year: [0,2,4,6,8,10,10,10,10,10,10,10],       allTime: [0,5,10,10]             },
+    10: { week: [10,10,10,10,10,10,10],      month: [10,10,10,10],           year: [0,2,4,6,8,10,10,10,10,10,10,10],       allTime: [0,5,10,10]             },
+    11: { week: [10,10,10,10,10,10,10],      month: [10,10,10,10],           year: [0,2,4,6,8,10,10,10,10,10,10,10],       allTime: [0,5,10,10]             },
+    12: { week: [30,35,38,40,42,42,42],      month: [25,32,38,42],           year: [0,4,8,12,18,22,26,30,34,38,40,42],     allTime: [0,8,18,28,36,42]       },
   },
 };
 
@@ -141,9 +141,10 @@ const TYPE_META = {
 };
 
 const state = {
-  tab:     'feed',
-  mktView: 'home',
-  mktType: null,
+  tab:         'feed',
+  mktView:     'home',
+  mktType:     null,
+  chartPeriod: 'week',
 };
 
 /* ─────────────────────────────────────
@@ -385,11 +386,17 @@ function getMember(id) {
 function avatarDiv(member, size = 36) {
   const m  = typeof member === 'number' ? getMember(member) : member;
   const fs = Math.floor(size * 0.32);
+  if (m.avatar) {
+    return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
+  }
   return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;font-size:${fs}px">${m.initials}</div>`;
 }
 
 function miniAvatarDiv(member) {
   const m = typeof member === 'number' ? getMember(member) : member;
+  if (m.avatar) {
+    return `<div class="mini-avatar" style="background:${m.color};overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
+  }
   return `<div class="mini-avatar" style="background:${m.color}">${m.initials}</div>`;
 }
 
@@ -628,6 +635,72 @@ function handleBuyOffering(offeringId, price, sellerId) {
    PROFILE
 ───────────────────────────────────── */
 
+const AVATAR_COLORS = [
+  '#FF6B35','#FB923C','#FCD34D','#F5C542','#4ADE80','#34D399','#22D3EE',
+  '#60A5FA','#A78BFA','#C084FC','#F472B6','#FF6B9D','#E11D48','#0EA5E9',
+  '#10B981','#FFFFFF',
+];
+
+function resizeImageToDataURL(file, size, quality, cb) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const s = Math.min(img.width, img.height);
+      const ox = (img.width  - s) / 2;
+      const oy = (img.height - s) / 2;
+      ctx.drawImage(img, ox, oy, s, s, 0, 0, size, size);
+      cb(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function openAvatarEditModal() {
+  const me = getMember(ME);
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">Edit profile picture</div>
+    <label class="avatar-upload-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Upload photo
+      <input type="file" accept="image/*" id="avatarFileInput" style="display:none">
+    </label>
+    <div class="avatar-divider">or choose a colour</div>
+    <div class="color-grid">
+      ${AVATAR_COLORS.map(c => `
+        <button class="color-swatch${me.color === c ? ' selected' : ''}" data-color="${c}" style="background:${c}">
+          ${me.color === c ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+        </button>`).join('')}
+    </div>
+  `;
+  openModal();
+
+  document.getElementById('avatarFileInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    resizeImageToDataURL(file, 200, 0.82, dataURL => {
+      me.avatar = dataURL;
+      saveToGist();
+      closeModal();
+      renderProfile();
+    });
+  });
+
+  document.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      me.color  = sw.dataset.color;
+      me.avatar = null;
+      saveToGist();
+      closeModal();
+      renderProfile();
+    });
+  });
+}
+
 function renderProfile() {
   if (isAdmin()) { renderAdminPanel(); return; }
 
@@ -638,17 +711,56 @@ function renderProfile() {
   const rank   = [...appData.members].sort((a, b) => b.balance - a.balance).findIndex(m => m.id === ME) + 1;
   const myOff  = appData.marketplace.offering.filter(o => o.by === ME);
 
-  const hist   = (appData.balanceHistory || {})[ME] || [];
-  const maxBal = Math.max(...hist, 1);
-  const bars   = hist.map((val, i) => {
-    const pct     = Math.round((val / maxBal) * 100);
-    const isToday = i === hist.length - 1;
+  const PERIOD_LABELS = {
+    week:    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    month:   ['W1','W2','W3','W4'],
+    year:    ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    allTime: ['M1','M2','M3','M4','M5','M6'],
+  };
+
+  const rawHist = (appData.balanceHistory || {})[ME] || {};
+  // backward-compat: if stored as flat array, treat as week
+  const histByPeriod = Array.isArray(rawHist) ? { week: rawHist, month: [], year: [], allTime: [] } : rawHist;
+
+  function buildChart(period) {
+    const hist   = histByPeriod[period] || [];
+    const labels = PERIOD_LABELS[period] || [];
+    if (!hist.length) return '<div class="empty-state" style="padding:24px 0">No data yet</div>';
+
+    const VW = 300, VH = 100;
+    const mt = 8, mb = 20, ml = 4, mr = 4;
+    const cw = VW - ml - mr, ch = VH - mt - mb;
+    const minV = Math.min(...hist);
+    const maxV = Math.max(...hist, minV + 1);
+    const n = hist.length;
+
+    const px = i => ml + (n === 1 ? cw / 2 : (i / (n - 1)) * cw);
+    const py = v => mt + (1 - (v - minV) / (maxV - minV)) * ch;
+
+    const pts  = hist.map((v, i) => `${px(i)},${py(v)}`).join(' ');
+    const area = `${px(0)},${mt + ch} ${pts} ${px(n-1)},${mt + ch}`;
+    const lx = px(n - 1), ly = py(hist[n - 1]);
+
+    const xLabels = hist.map((_, i) => {
+      const isLast = i === n - 1;
+      const lbl = labels[i] ?? '';
+      return `<text x="${px(i)}" y="${VH - 3}" text-anchor="middle" class="lc-xlabel${isLast ? ' lc-xlabel-now' : ''}">${lbl}</text>`;
+    }).join('');
+
     return `
-      <div class="bar-col ${isToday ? 'today' : ''}">
-        <div class="bar ${isToday ? 'today' : ''}" style="height:${pct}%"></div>
-        <div class="bar-day">${DAYS[i] ?? ''}</div>
-      </div>`;
-  }).join('');
+      <svg class="lc-svg" viewBox="0 0 ${VW} ${VH}">
+        <defs>
+          <linearGradient id="lcg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#F5C542" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#F5C542" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <polygon points="${area}" fill="url(#lcg)"/>
+        <polyline points="${pts}" fill="none" stroke="#F5C542" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${lx}" cy="${ly}" r="3.5" fill="#F5C542"/>
+        ${xLabels}
+      </svg>`;
+  }
 
   const recentRows = myTxns.slice(0, 6).map(t => {
     const isIn  = t.to === ME;
@@ -670,7 +782,16 @@ function renderProfile() {
 
   document.getElementById('profile-body').innerHTML = `
     <div class="profile-hero">
-      <div class="profile-avatar" style="background:${me.color}">${me.initials}</div>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" style="background:${me.color}">
+          ${me.avatar ? `<img src="${me.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : me.initials}
+        </div>
+        <button class="avatar-edit-btn" id="btnEditAvatar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <path d="M16.862 3.487a2.625 2.625 0 1 1 3.712 3.713L7.5 20.273l-4.5 1.227 1.227-4.5L16.862 3.487z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
       <div class="profile-name">${me.name}</div>
       <div class="profile-balance">${me.balance}</div>
       <div class="profile-balance-label"><span class="cb-mark">ᴄʙ</span> cool bucks</div>
@@ -682,11 +803,18 @@ function renderProfile() {
       <div class="stat-item"><div class="stat-value">${rankLabel}</div><div class="stat-label">Rank</div></div>
     </div>
 
-    ${hist.length ? `
     <div class="chart-section">
-      <div class="section-label">Balance History</div>
-      <div class="bar-chart">${bars}</div>
-    </div>` : ''}
+      <div class="chart-header">
+        <div class="section-label" style="margin-bottom:0">Balance History</div>
+        <div class="period-picker">
+          ${['week','month','year','allTime'].map(p => `
+            <button class="period-btn${state.chartPeriod === p ? ' active' : ''}" data-period="${p}">
+              ${{ week:'1W', month:'1M', year:'1Y', allTime:'All' }[p]}
+            </button>`).join('')}
+        </div>
+      </div>
+      <div id="chart-area">${buildChart(state.chartPeriod)}</div>
+    </div>
 
     <div class="profile-section">
       <div class="profile-section-header">My Offerings</div>
@@ -702,6 +830,16 @@ function renderProfile() {
       ${recentRows || '<div class="empty-state">No transactions yet</div>'}
     </div>
   `;
+
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.chartPeriod = btn.dataset.period;
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.getElementById('chart-area').innerHTML = buildChart(state.chartPeriod);
+    });
+  });
+
+  document.getElementById('btnEditAvatar').addEventListener('click', openAvatarEditModal);
 }
 
 function renderAdminPanel() {
@@ -1059,9 +1197,19 @@ function showToast(msg) {
 function switchTab(tabId) {
   if (state.tab === tabId) return;
   state.tab = tabId;
+  // Reset marketplace to home grid whenever leaving or entering it
+  if (state.mktView === 'list') {
+    state.mktView = 'home';
+    state.mktType = null;
+    document.getElementById('mkt-home').classList.remove('hidden');
+    document.getElementById('mkt-list').classList.add('hidden');
+  }
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById(`tab-${tabId}`).classList.add('active');
+  const pane = document.getElementById(`tab-${tabId}`);
+  pane.classList.add('active');
+  pane.scrollTop = 0;
+  pane.querySelectorAll('.feed-list, .mkt-scroll-area, .mkt-items, .profile-body').forEach(el => { el.scrollTop = 0; });
   document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
 }
 
