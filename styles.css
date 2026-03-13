@@ -50,6 +50,7 @@ body {
   background: var(--s1);
   color: var(--white);
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
   overscroll-behavior: none;
   overflow: hidden;
   height: 100dvh;
