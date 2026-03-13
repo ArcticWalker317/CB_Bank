@@ -320,7 +320,7 @@ function showLoginScreen() {
 
   grid.innerHTML = appData.members.map(m => `
     <button class="login-member-card" data-id="${m.id}">
-      <div class="login-avatar" style="background:${m.color}">${m.initials}</div>
+      <div class="login-avatar" style="background:${m.color};${m.avatar ? 'overflow:hidden;padding:0' : ''}">${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : m.initials}</div>
       <div class="login-name">${m.name}</div>
     </button>
   `).join('') + `
@@ -389,6 +389,7 @@ function avatarDiv(member, size = 36) {
   if (m.avatar) {
     return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
   }
+  if (m.avatar) return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
   return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;font-size:${fs}px">${m.initials}</div>`;
 }
 
@@ -398,6 +399,14 @@ function miniAvatarDiv(member) {
     return `<div class="mini-avatar" style="background:${m.color};overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
   }
   return `<div class="mini-avatar" style="background:${m.color}">${m.initials}</div>`;
+}
+
+function inlineAvatar(m, size) {
+  const inner = m.avatar
+    ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+    : m.initials;
+  const extra = m.avatar ? 'overflow:hidden;padding:0;' : `font-size:${Math.floor(size*0.32)}px;`;
+  return `<div class="member-avatar" style="background:${m.color};width:${size}px;height:${size}px;${extra}flex-shrink:0">${inner}</div>`;
 }
 
 function cbNum(n, sign = '') {
@@ -426,7 +435,9 @@ function renderMembersStrip() {
     const isMe = m.id === ME;
     return `
       <div class="member-card ${isMe ? 'is-me' : ''}">
-        <div class="member-avatar" style="background:${m.color}">${m.initials}</div>
+        <div class="member-avatar" style="background:${m.color};${m.avatar ? 'overflow:hidden;padding:0' : ''}">
+          ${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : m.initials}
+        </div>
         <div>
           <div class="member-name">${isMe ? 'You' : m.name}</div>
           <div class="member-balance">${m.balance} ᴄʙ</div>
@@ -854,7 +865,7 @@ function renderAdminPanel() {
     return `
       <div class="admin-member-row">
         <span class="admin-rank">${medal}</span>
-        <div class="member-avatar" style="background:${m.color};width:32px;height:32px;font-size:10px;flex-shrink:0">${m.initials}</div>
+        ${inlineAvatar(m, 32)}
         <span class="admin-member-name">${m.name}</span>
         <span class="admin-member-bal">${cbNum(m.balance)}</span>
         <button class="admin-give-btn" data-id="${m.id}" data-name="${m.name}">Give</button>
@@ -916,7 +927,7 @@ function openAdminMintModal(preselectedId = null) {
     <div class="member-picker" id="mint-picker">
       ${appData.members.map(m => `
         <div class="member-pick-item ${m.id === preselectedId ? 'selected' : ''}" data-id="${m.id}">
-          <div class="member-avatar" style="background:${m.color};width:40px;height:40px;font-size:13px">${m.initials}</div>
+          ${inlineAvatar(m, 40)}
           <span>${m.name}</span>
         </div>`).join('')}
     </div>
@@ -986,7 +997,7 @@ function openAdminResolveModal(item, type) {
       <div class="member-picker" id="award-picker">
         ${appData.members.map(m => `
           <div class="member-pick-item" data-id="${m.id}">
-            <div class="member-avatar" style="background:${m.color};width:40px;height:40px;font-size:13px">${m.initials}</div>
+            ${inlineAvatar(m, 40)}
             <span>${m.name}</span>
           </div>`).join('')}
       </div>
@@ -1061,7 +1072,7 @@ function openSendModal() {
     <div class="member-picker" id="send-picker">
       ${others.map(m => `
         <div class="member-pick-item" data-id="${m.id}">
-          <div class="member-avatar" style="background:${m.color};width:40px;height:40px;font-size:13px">${m.initials}</div>
+          ${inlineAvatar(m, 40)}
           <span>${m.name}</span>
         </div>`).join('')}
     </div>
