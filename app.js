@@ -419,7 +419,7 @@ function inlineAvatar(m, size) {
 }
 
 function cbNum(n, sign = '') {
-  return `${sign}${n}<span class="cb-mark" style="font-size:10px;letter-spacing:-0.5px;margin-left:1px;vertical-align:1px">ᴄʙ</span>`;
+  return `${sign}${n}<span class="cb-mark" style="font-size:10px;letter-spacing:-0.5px">ᴄʙ</span>`;
 }
 
 function renderAll() {
@@ -430,7 +430,7 @@ function renderAll() {
   // Swap feed header button for admin
   const sendBtn = document.getElementById('btnSend');
   if (sendBtn) {
-    sendBtn.textContent = isAdmin() ? 'Mint ᴄʙ' : 'Send ᴄʙ';
+    sendBtn.innerHTML = isAdmin() ? 'Mint <span class="cb-mark">ᴄʙ</span>' : 'Send <span class="cb-mark">ᴄʙ</span>';
   }
 }
 
@@ -447,7 +447,7 @@ function renderMembersStrip() {
         ${inlineAvatar(m, 40)}
         <div>
           <div class="member-name">${isMe ? 'You' : m.name}</div>
-          <div class="member-balance">${m.balance} ᴄʙ</div>
+          <div class="member-balance">${m.balance} <span class="cb-mark">ᴄʙ</span></div>
         </div>
       </div>
     `;
