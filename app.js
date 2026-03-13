@@ -115,6 +115,7 @@ const DEFAULT_DATA = {
     11: { week: [10,10,10,10,10,10,10],      month: [10,10,10,10],           year: [0,2,4,6,8,10,10,10,10,10,10,10],       allTime: [0,5,10,10]             },
     12: { week: [30,35,38,40,42,42,42],      month: [25,32,38,42],           year: [0,4,8,12,18,22,26,30,34,38,40,42],     allTime: [0,8,18,28,36,42]       },
   },
+  avatars: {},  // keyed by member id (string), stores base64 jpeg data URLs
 };
 
 /* ─────────────────────────────────────
@@ -231,8 +232,11 @@ async function saveToGist() {
   if (!CONFIG.GIST_ID || !CONFIG.GITHUB_TOKEN) return;
 
   try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 12000); // 12s timeout for saves
     await fetch(`https://api.github.com/gists/${CONFIG.GIST_ID}`, {
       method: 'PATCH',
+      signal: ctrl.signal,
       headers: {
         Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
         'Content-Type': 'application/json',
@@ -242,6 +246,7 @@ async function saveToGist() {
         files: { [CONFIG.GIST_FILENAME]: { content: raw } },
       }),
     });
+    clearTimeout(t);
   } catch (err) {
     console.warn('Gist save failed (data is saved locally):', err);
     showToast('Saved locally — will sync when back online');
@@ -320,7 +325,7 @@ function showLoginScreen() {
 
   grid.innerHTML = appData.members.map(m => `
     <button class="login-member-card" data-id="${m.id}">
-      <div class="login-avatar" style="background:${m.color};${m.avatar ? 'overflow:hidden;padding:0' : ''}">${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : m.initials}</div>
+      <div class="login-avatar" style="background:${m.color};${getAvatar(m.id) ? 'overflow:hidden;padding:0' : ''}">${getAvatar(m.id) ? `<img src="${getAvatar(m.id)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : m.initials}</div>
       <div class="login-name">${m.name}</div>
     </button>
   `).join('') + `
@@ -383,29 +388,33 @@ function getMember(id) {
   return appData.members.find(m => m.id === id) || BANK;
 }
 
+function getAvatar(memberId) {
+  // Check new dedicated avatars store first, then fall back to legacy m.avatar
+  const fromStore = (appData.avatars || {})[String(memberId)];
+  if (fromStore) return fromStore;
+  const m = appData.members.find(m => m.id === memberId);
+  return m?.avatar || null;
+}
+
 function avatarDiv(member, size = 36) {
   const m  = typeof member === 'number' ? getMember(member) : member;
+  const av = getAvatar(m.id);
   const fs = Math.floor(size * 0.32);
-  if (m.avatar) {
-    return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
-  }
-  if (m.avatar) return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
+  if (av) return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;overflow:hidden;padding:0"><img src="${av}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
   return `<div class="feed-avatar" style="background:${m.color};width:${size}px;height:${size}px;font-size:${fs}px">${m.initials}</div>`;
 }
 
 function miniAvatarDiv(member) {
-  const m = typeof member === 'number' ? getMember(member) : member;
-  if (m.avatar) {
-    return `<div class="mini-avatar" style="background:${m.color};overflow:hidden;padding:0"><img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
-  }
+  const m  = typeof member === 'number' ? getMember(member) : member;
+  const av = getAvatar(m.id);
+  if (av) return `<div class="mini-avatar" style="background:${m.color};overflow:hidden;padding:0"><img src="${av}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`;
   return `<div class="mini-avatar" style="background:${m.color}">${m.initials}</div>`;
 }
 
 function inlineAvatar(m, size) {
-  const inner = m.avatar
-    ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-    : m.initials;
-  const extra = m.avatar ? 'overflow:hidden;padding:0;' : `font-size:${Math.floor(size*0.32)}px;`;
+  const av    = getAvatar(m.id);
+  const inner = av ? `<img src="${av}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : m.initials;
+  const extra = av ? 'overflow:hidden;padding:0;' : `font-size:${Math.floor(size*0.32)}px;`;
   return `<div class="member-avatar" style="background:${m.color};width:${size}px;height:${size}px;${extra}flex-shrink:0">${inner}</div>`;
 }
 
@@ -435,9 +444,7 @@ function renderMembersStrip() {
     const isMe = m.id === ME;
     return `
       <div class="member-card ${isMe ? 'is-me' : ''}">
-        <div class="member-avatar" style="background:${m.color};${m.avatar ? 'overflow:hidden;padding:0' : ''}">
-          ${m.avatar ? `<img src="${m.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : m.initials}
-        </div>
+        ${inlineAvatar(m, 40)}
         <div>
           <div class="member-name">${isMe ? 'You' : m.name}</div>
           <div class="member-balance">${m.balance} ᴄʙ</div>
@@ -693,8 +700,9 @@ function openAvatarEditModal() {
   document.getElementById('avatarFileInput').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
-    resizeImageToDataURL(file, 200, 0.82, dataURL => {
-      me.avatar = dataURL;
+    resizeImageToDataURL(file, 120, 0.65, dataURL => {
+      if (!appData.avatars) appData.avatars = {};
+      appData.avatars[String(ME)] = dataURL;
       saveToGist();
       closeModal();
       renderAll();
@@ -703,8 +711,8 @@ function openAvatarEditModal() {
 
   document.querySelectorAll('.color-swatch').forEach(sw => {
     sw.addEventListener('click', () => {
-      me.color  = sw.dataset.color;
-      me.avatar = null;
+      me.color = sw.dataset.color;
+      if (appData.avatars) delete appData.avatars[String(ME)];
       saveToGist();
       closeModal();
       renderAll();
@@ -794,8 +802,8 @@ function renderProfile() {
   document.getElementById('profile-body').innerHTML = `
     <div class="profile-hero">
       <div class="profile-avatar-wrap">
-        <div class="profile-avatar" style="background:${me.color}">
-          ${me.avatar ? `<img src="${me.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : me.initials}
+        <div class="profile-avatar" style="background:${me.color};${getAvatar(ME) ? 'overflow:hidden;padding:0' : ''}">
+          ${getAvatar(ME) ? `<img src="${getAvatar(ME)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : me.initials}
         </div>
         <button class="avatar-edit-btn" id="btnEditAvatar">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
