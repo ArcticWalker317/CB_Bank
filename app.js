@@ -23,9 +23,10 @@
    no other GitHub data is at risk.
 ───────────────────────────────────── */
 //THE GIST TOKEN EXPIRATION DATE IS 10/13/2026
+// config.js (gitignored) can override these via window.CB_CONFIG
 const CONFIG = {
-  GIST_ID:       '8172211ac15c9934a4b52a52ee452a7e',  // e.g. 'a1b2c3d4e5f6...'
-  GITHUB_TOKEN:  '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',  // e.g. 'ghp_xxxxxxxxxxxxxxxxxxxx'
+  GIST_ID:       (window.CB_CONFIG || {}).GIST_ID       || '',
+  GITHUB_TOKEN:  (window.CB_CONFIG || {}).GITHUB_TOKEN   || '',
   GIST_FILENAME: 'cbbank-data.json',
 };
 
@@ -150,36 +151,58 @@ function deleteCookie(name) {
    GIST DATA STORE
 ───────────────────────────────────── */
 
+function isValidData(d) {
+  return d && Array.isArray(d.members) && d.members.length > 0
+      && Array.isArray(d.feed)
+      && d.marketplace && typeof d.marketplace === 'object';
+}
+
 async function loadFromGist() {
   // No Gist configured — try localStorage cache, then fall back to defaults
   if (!CONFIG.GIST_ID) {
     const cached = localStorage.getItem('cbbank-cache');
     if (cached) {
-      try { appData = JSON.parse(cached); } catch (_) {}
+      try {
+        const parsed = JSON.parse(cached);
+        if (isValidData(parsed)) appData = parsed;
+      } catch (_) {}
     }
     return;
   }
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000); // 6s timeout
+
     const res = await fetch(`https://api.github.com/gists/${CONFIG.GIST_ID}`, {
+      signal: controller.signal,
       headers: {
         Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
         Accept: 'application/vnd.github.v3+json',
       },
     });
+    clearTimeout(timeout);
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const gist = await res.json();
     const raw  = gist.files[CONFIG.GIST_FILENAME]?.content;
     if (!raw) throw new Error('file not found in gist');
-    appData = JSON.parse(raw);
+
+    const parsed = JSON.parse(raw);
+    if (!isValidData(parsed)) throw new Error('gist data missing required fields');
+
+    appData = parsed;
     localStorage.setItem('cbbank-cache', raw); // update offline cache
   } catch (err) {
     console.warn('Gist load failed, trying local cache:', err);
     const cached = localStorage.getItem('cbbank-cache');
     if (cached) {
-      try { appData = JSON.parse(cached); } catch (_) {}
+      try {
+        const parsed = JSON.parse(cached);
+        if (isValidData(parsed)) appData = parsed;
+      } catch (_) {}
     }
-    // Otherwise appData stays as DEFAULT_DATA
+    // Otherwise appData stays as DEFAULT_DATA (always valid)
   }
 }
 

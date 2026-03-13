@@ -57,9 +57,10 @@ input, textarea, select { font: inherit; }
 .hidden { display: none !important; }
 
 /* ── Desktop centering ── */
+/* #screen-login is position:fixed/inset:0 — never constrain its width */
+/* Only #app gets the iPhone-frame treatment on desktop */
 @media (min-width: 430px) {
-  body { display: flex; justify-content: center; }
-  #screen-login,
+  body { display: flex; justify-content: center; background: #000; }
   #app { max-width: 430px; width: 100%; border: 1px solid var(--border); }
 }
 
