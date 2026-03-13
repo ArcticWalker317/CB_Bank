@@ -38,27 +38,37 @@ const CONFIG = {
 
 const DEFAULT_DATA = {
   members: [
-    { id: 1, name: 'Andrew',   initials: 'AN', balance: 47, color: '#FF6B35' },
-    { id: 2, name: 'Kasra',    initials: 'KS', balance: 23, color: '#A78BFA' },
-    { id: 3, name: 'Caroline', initials: 'CA', balance: 61, color: '#F472B6' },
-    { id: 4, name: 'Kit',      initials: 'KT', balance: 18, color: '#4ADE80' },
-    { id: 5, name: 'Das',      initials: 'DA', balance: 35, color: '#FCD34D' },
-    { id: 6, name: 'Nora',     initials: 'NO', balance: 42, color: '#22D3EE' },
-    { id: 7, name: 'Tyler',    initials: 'TY', balance: 29, color: '#FB923C' },
+    { id:  1, name: 'Andrew',   initials: 'AN', balance: 47, color: '#FF6B35' },
+    { id:  2, name: 'Kasra',    initials: 'KS', balance: 23, color: '#A78BFA' },
+    { id:  3, name: 'Kate',     initials: 'KE', balance: 10, color: '#FF6B9D' },
+    { id:  4, name: 'Caroline', initials: 'CA', balance: 61, color: '#F472B6' },
+    { id:  5, name: 'Kayla',    initials: 'KY', balance: 10, color: '#C084FC' },
+    { id:  6, name: 'Tyler',    initials: 'TY', balance: 29, color: '#FB923C' },
+    { id:  7, name: 'Kit',      initials: 'KT', balance: 18, color: '#4ADE80' },
+    { id:  8, name: 'Das',      initials: 'DA', balance: 35, color: '#FCD34D' },
+    { id:  9, name: 'Owen',     initials: 'OW', balance: 10, color: '#34D399' },
+    { id: 10, name: 'Grant',    initials: 'GR', balance: 10, color: '#60A5FA' },
+    { id: 11, name: 'Kaley',    initials: 'KL', balance: 10, color: '#F59E0B' },
+    { id: 12, name: 'Nora',     initials: 'NO', balance: 42, color: '#22D3EE' },
   ],
   feed: [
-    { id: 1,  from: 2,    to: 1,    amount: 5,  desc: '1:1 concert',                    type: 'offering', time: '2h ago'  },
-    { id: 2,  from: 3,    to: 4,    amount: 10, desc: 'custom bracelet',                 type: 'offering', time: '3h ago'  },
-    { id: 3,  from: null, to: 1,    amount: 20, desc: "Quest: got a stranger's number",  type: 'quest',    time: '5h ago'  },
-    { id: 4,  from: 1,    to: 2,    amount: 4,  desc: 'portrait photoshoot',             type: 'offering', time: '1d ago'  },
-    { id: 5,  from: 5,    to: null, amount: 3,  desc: 'Veto power — picked restaurant',  type: 'system',   time: '1d ago'  },
-    { id: 6,  from: null, to: 3,    amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '2d ago'  },
-    { id: 7,  from: 1,    to: null, amount: 5,  desc: 'Immunity from dare',              type: 'system',   time: '3d ago'  },
-    { id: 8,  from: 2,    to: 3,    amount: 2,  desc: 'psychic reading',                 type: 'offering', time: '3d ago'  },
-    { id: 9,  from: 4,    to: 6,    amount: 5,  desc: 'custom poem',                     type: 'offering', time: '4d ago'  },
-    { id: 10, from: null, to: 4,    amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '5d ago'  },
-    { id: 11, from: 6,    to: 1,    amount: 5,  desc: 'Spotlight hype 🔦',               type: 'system',   time: '6d ago'  },
-    { id: 12, from: 7,    to: 5,    amount: 15, desc: 'lost the Nora bet',               type: 'bet',      time: '1w ago'  },
+    { id:  1, from:  2, to:  1,    amount: 5,  desc: '1:1 concert',                    type: 'offering', time: '2h ago'  },
+    { id:  2, from:  4, to:  7,    amount: 10, desc: 'custom bracelet',                 type: 'offering', time: '3h ago'  },
+    { id:  3, from: null, to: 1,   amount: 20, desc: "Quest: got a stranger's number",  type: 'quest',    time: '5h ago'  },
+    { id:  4, from:  1, to:  2,    amount: 4,  desc: 'portrait photoshoot',             type: 'offering', time: '1d ago'  },
+    { id:  5, from:  8, to: null,  amount: 3,  desc: 'Veto power — picked restaurant',  type: 'system',   time: '1d ago'  },
+    { id:  6, from: null, to: 4,   amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '2d ago'  },
+    { id:  7, from:  1, to: null,  amount: 5,  desc: 'Immunity from dare',              type: 'system',   time: '3d ago'  },
+    { id:  8, from:  2, to:  4,    amount: 2,  desc: 'psychic reading',                 type: 'offering', time: '3d ago'  },
+    { id:  9, from:  7, to: 12,    amount: 5,  desc: 'custom poem',                     type: 'offering', time: '4d ago'  },
+    { id: 10, from: null, to: 7,   amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '5d ago'  },
+    { id: 11, from: 12, to:  1,    amount: 5,  desc: 'Spotlight hype 🔦',               type: 'system',   time: '6d ago'  },
+    { id: 12, from:  6, to:  8,    amount: 15, desc: 'lost the Nora bet',               type: 'bet',      time: '1w ago'  },
+    { id: 13, from: null, to:  3,  amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '1w ago'  },
+    { id: 14, from: null, to:  5,  amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '1w ago'  },
+    { id: 15, from: null, to:  9,  amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '1w ago'  },
+    { id: 16, from: null, to: 10,  amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '1w ago'  },
+    { id: 17, from: null, to: 11,  amount: 10, desc: 'Sign-up bonus 🎉',                type: 'bonus',    time: '1w ago'  },
   ],
   marketplace: {
     bounty: [
@@ -92,13 +102,18 @@ const DEFAULT_DATA = {
     ],
   },
   balanceHistory: {
-    1: [32, 28, 40, 35, 44, 42, 47],
-    2: [10, 15, 12, 20, 18, 23, 23],
-    3: [40, 45, 50, 55, 58, 60, 61],
-    4: [10, 10, 15, 12, 18, 18, 18],
-    5: [20, 25, 30, 28, 32, 35, 35],
-    6: [30, 35, 38, 40, 42, 42, 42],
-    7: [15, 20, 25, 28, 30, 29, 29],
+     1: [32, 28, 40, 35, 44, 42, 47],
+     2: [10, 15, 12, 20, 18, 23, 23],
+     3: [10, 10, 10, 10, 10, 10, 10],
+     4: [40, 45, 50, 55, 58, 60, 61],
+     5: [10, 10, 10, 10, 10, 10, 10],
+     6: [15, 20, 25, 28, 30, 29, 29],
+     7: [10, 10, 15, 12, 18, 18, 18],
+     8: [20, 25, 30, 28, 32, 35, 35],
+     9: [10, 10, 10, 10, 10, 10, 10],
+    10: [10, 10, 10, 10, 10, 10, 10],
+    11: [10, 10, 10, 10, 10, 10, 10],
+    12: [30, 35, 38, 40, 42, 42, 42],
   },
 };
 
@@ -113,7 +128,9 @@ let appData = JSON.parse(JSON.stringify(DEFAULT_DATA));     // live data (deep c
    CONSTANTS
 ───────────────────────────────────── */
 
-const BANK = { name: 'Bank', initials: 'ᴄʙ', color: '#F5C542' };
+const BANK  = { name: 'Bank',  initials: 'ᴄʙ',  color: '#F5C542' };
+const ADMIN_ID = 0; // special id — not in members array
+const isAdmin  = () => ME === ADMIN_ID;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const TYPE_META = {
@@ -242,12 +259,18 @@ function showLoginScreen() {
       <div class="login-avatar" style="background:${m.color}">${m.initials}</div>
       <div class="login-name">${m.name}</div>
     </button>
-  `).join('');
+  `).join('') + `
+    <button class="login-admin-card" data-id="${ADMIN_ID}">
+      <div class="login-admin-icon">🏦</div>
+      <div class="login-admin-label">Bank Admin</div>
+      <div class="login-admin-sub">manage · monitor · mint</div>
+    </button>
+  `;
 
-  grid.querySelectorAll('.login-member-card').forEach(card => {
+  grid.querySelectorAll('.login-member-card, .login-admin-card').forEach(card => {
     card.addEventListener('click', () => {
       const id = parseInt(card.dataset.id);
-      setCookie('cbbank_me', id, 365); // remember for 1 year
+      setCookie('cbbank_me', id, 365);
       ME = id;
       const loginEl = document.getElementById('screen-login');
       loginEl.classList.add('fade-out');
@@ -308,6 +331,11 @@ function renderAll() {
   renderFeed();
   renderMarketGrid();
   renderProfile();
+  // Swap feed header button for admin
+  const sendBtn = document.getElementById('btnSend');
+  if (sendBtn) {
+    sendBtn.textContent = isAdmin() ? 'Mint ᴄʙ' : 'Send ᴄʙ';
+  }
 }
 
 /* ─────────────────────────────────────
@@ -404,6 +432,9 @@ function renderMarketItems(type) {
   el.innerHTML = items.map((item, i) => {
     let inner = '';
 
+    const adminBtn = (label, dataAttr) =>
+      isAdmin() ? `<button class="admin-action-btn" ${dataAttr}>${label}</button>` : '';
+
     if (type === 'bounty') {
       const poster = getMember(item.postedBy);
       inner = `
@@ -413,7 +444,9 @@ function renderMarketItems(type) {
         </div>
         <div class="mkt-item-footer">
           <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
-          <span class="status-tag status-${item.status}">${item.status}</span>
+          ${item.status !== 'claimed'
+            ? adminBtn('🏆 Award', `data-admin-action="award-bounty" data-idx="${appData.marketplace.bounty.indexOf(item)}"`)
+            : `<span class="status-tag status-claimed">claimed</span>`}
         </div>`;
 
     } else if (type === 'quest') {
@@ -425,7 +458,9 @@ function renderMarketItems(type) {
         </div>
         <div class="mkt-item-footer">
           <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span class="deadline-tag">⏱ ${item.deadline}</span></div>
-          <span class="status-tag status-${item.status}">${item.status}</span>
+          ${item.status === 'live'
+            ? adminBtn('🏆 Award', `data-admin-action="award-quest" data-idx="${appData.marketplace.quest.indexOf(item)}"`)
+            : `<span class="status-tag status-${item.status}">${item.status}</span>`}
         </div>`;
 
     } else if (type === 'bet') {
@@ -439,7 +474,9 @@ function renderMarketItems(type) {
         </div>
         <div class="mkt-item-footer">
           <div class="mkt-item-by">${miniAvatarDiv(fromM)}<span>${fromM.name}</span><span class="vs-divider">vs</span>${miniAvatarDiv(toM)}<span>${toM.name}</span></div>
-          <span class="status-tag status-${item.status}">${item.status}</span>
+          ${item.status === 'open'
+            ? adminBtn('⚖️ Resolve', `data-admin-action="resolve-bet" data-idx="${appData.marketplace.bet.indexOf(item)}"`)
+            : `<span class="status-tag status-${item.status}">${item.status}</span>`}
         </div>
         <div class="adj-tag">Judge: ${adjM.name} · ${item.time}</div>`;
 
@@ -452,10 +489,12 @@ function renderMarketItems(type) {
           <div class="mkt-item-amount">${cbNum(item.price)}</div>
         </div>
         <div class="mkt-item-footer">
-          <div class="mkt-item-by">${miniAvatarDiv(byM)}<span>${isMe ? 'You' : byM.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
-          ${isMe
-            ? '<span class="status-tag status-yours">yours</span>'
-            : `<button class="buy-btn" data-id="${item.id}" data-price="${item.price}" data-by="${item.by}">Buy</button>`
+          <div class="mkt-item-by">${miniAvatarDiv(byM)}<span>${isMe && !isAdmin() ? 'You' : byM.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
+          ${isAdmin()
+            ? adminBtn('🗑 Remove', `data-admin-action="remove-offering" data-idx="${appData.marketplace.offering.indexOf(item)}"`)
+            : isMe
+              ? '<span class="status-tag status-yours">yours</span>'
+              : `<button class="buy-btn" data-id="${item.id}" data-price="${item.price}" data-by="${item.by}">Buy</button>`
           }
         </div>`;
     }
@@ -467,6 +506,23 @@ function renderMarketItems(type) {
     btn.addEventListener('click', () =>
       handleBuyOffering(btn.dataset.id, parseInt(btn.dataset.price), parseInt(btn.dataset.by))
     );
+  });
+
+  el.querySelectorAll('.admin-action-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.adminAction;
+      const idx    = parseInt(btn.dataset.idx);
+      if (action === 'resolve-bet')    openAdminResolveModal(appData.marketplace.bet[idx],    'bet');
+      if (action === 'award-quest')    openAdminResolveModal(appData.marketplace.quest[idx],  'quest');
+      if (action === 'award-bounty')   openAdminResolveModal(appData.marketplace.bounty[idx], 'bounty');
+      if (action === 'remove-offering') {
+        appData.marketplace.offering.splice(idx, 1);
+        renderMarketItems('offering');
+        renderMarketGrid();
+        saveToGist();
+        showToast('Offering removed');
+      }
+    });
   });
 }
 
@@ -497,6 +553,8 @@ function handleBuyOffering(offeringId, price, sellerId) {
 ───────────────────────────────────── */
 
 function renderProfile() {
+  if (isAdmin()) { renderAdminPanel(); return; }
+
   const me     = getMember(ME);
   const myTxns = appData.feed.filter(t => t.from === ME || t.to === ME);
   const earned = myTxns.filter(t => t.to === ME).reduce((s, t) => s + t.amount, 0);
@@ -570,9 +628,214 @@ function renderProfile() {
   `;
 }
 
+function renderAdminPanel() {
+  const sorted      = [...appData.members].sort((a, b) => b.balance - a.balance);
+  const totalCB     = appData.members.reduce((s, m) => s + m.balance, 0);
+  const totalTxns   = appData.feed.length;
+  const openBets    = appData.marketplace.bet.filter(b => b.status === 'open').length;
+  const livequests  = appData.marketplace.quest.filter(q => q.status === 'live').length;
+
+  const leaderboard = sorted.map((m, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+    return `
+      <div class="admin-member-row">
+        <span class="admin-rank">${medal}</span>
+        <div class="member-avatar" style="background:${m.color};width:32px;height:32px;font-size:10px;flex-shrink:0">${m.initials}</div>
+        <span class="admin-member-name">${m.name}</span>
+        <span class="admin-member-bal">${cbNum(m.balance)}</span>
+        <button class="admin-give-btn" data-id="${m.id}" data-name="${m.name}">Give</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('profile-body').innerHTML = `
+    <div class="admin-hero">
+      <div class="admin-hero-icon">🏦</div>
+      <div class="admin-hero-title">Bank Admin</div>
+      <div class="admin-hero-sub">full access</div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-item"><div class="stat-value">${totalCB}</div><div class="stat-label">Total ᴄʙ</div></div>
+      <div class="stat-item"><div class="stat-value">${totalTxns}</div><div class="stat-label">Txns</div></div>
+      <div class="stat-item"><div class="stat-value">${openBets + livequests}</div><div class="stat-label">Active</div></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-header">Leaderboard</div>
+      <div class="admin-member-list">${leaderboard}</div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-header">Recent Activity</div>
+      ${appData.feed.slice(0, 8).map(t => {
+        const fromM = t.from ? getMember(t.from) : BANK;
+        const toM   = t.to   ? getMember(t.to)   : BANK;
+        return `
+          <div class="feed-card" style="margin-bottom:8px">
+            ${avatarDiv(fromM, 32)}<div class="feed-arrow" style="margin:0 3px">→</div>${avatarDiv(toM, 32)}
+            <div class="feed-body">
+              <div class="feed-desc" style="font-size:12.5px">${t.desc}</div>
+              <div class="feed-meta">${fromM.name} → ${toM.name} · ${t.time}</div>
+            </div>
+            <div class="feed-amount">${cbNum(t.amount)}</div>
+          </div>`;
+      }).join('')}
+    </div>
+  `;
+
+  // Wire up Give buttons
+  document.querySelectorAll('.admin-give-btn').forEach(btn => {
+    btn.addEventListener('click', () => openAdminMintModal(parseInt(btn.dataset.id)));
+  });
+}
+
 /* ─────────────────────────────────────
    MODAL: SEND ᴄʙ
 ───────────────────────────────────── */
+
+function openAdminMintModal(preselectedId = null) {
+  let selectedId = preselectedId;
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">🏦 Mint <span class="cb-mark">ᴄʙ</span></div>
+    <label class="modal-label">Give to</label>
+    <div class="member-picker" id="mint-picker">
+      ${appData.members.map(m => `
+        <div class="member-pick-item ${m.id === preselectedId ? 'selected' : ''}" data-id="${m.id}">
+          <div class="member-avatar" style="background:${m.color};width:40px;height:40px;font-size:13px">${m.initials}</div>
+          <span>${m.name}</span>
+        </div>`).join('')}
+    </div>
+    <label class="modal-label">Amount</label>
+    <input class="modal-input" id="mint-amount" type="number" inputmode="decimal" placeholder="0" min="1">
+    <label class="modal-label">Reason</label>
+    <input class="modal-input" id="mint-reason" type="text" placeholder="e.g. Quest reward, bonus…">
+    <button class="modal-submit" id="do-mint">Mint & Send</button>
+  `;
+
+  document.getElementById('mint-picker').querySelectorAll('.member-pick-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('#mint-picker .member-pick-item').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected');
+      selectedId = parseInt(item.dataset.id);
+    });
+  });
+
+  document.getElementById('do-mint').addEventListener('click', () => {
+    const amount = parseFloat(document.getElementById('mint-amount').value);
+    const reason = document.getElementById('mint-reason').value.trim() || 'Admin grant';
+    if (!selectedId)            { showToast('Pick a member'); return; }
+    if (!amount || amount <= 0) { showToast('Enter an amount'); return; }
+
+    const receiver = appData.members.find(m => m.id === selectedId);
+    receiver.balance += amount;
+
+    appData.feed.unshift({
+      id: Date.now(), from: null, to: selectedId,
+      amount, desc: reason, type: 'bonus', time: 'just now',
+    });
+
+    closeModal();
+    renderAll();
+    saveToGist();
+    showToast(`Minted ${amount} ᴄʙ → ${receiver.name}`);
+  });
+
+  openModal();
+}
+
+function openAdminResolveModal(item, type) {
+  let html = '';
+
+  if (type === 'bet') {
+    const fromM = getMember(item.from);
+    const toM   = getMember(item.to);
+    html = `
+      <div class="modal-title">⚖️ Resolve Bet</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:20px;line-height:1.4">${item.title}</div>
+      <label class="modal-label">Who wins ${cbNum(item.amount)}?</label>
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <button class="resolve-btn" data-winner="${item.from}" style="flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;font-size:14px;font-weight:700;color:var(--white);transition:all .15s">
+          ${avatarDiv(fromM, 36)}<span style="margin-top:6px;display:block">${fromM.name}</span>
+        </button>
+        <button class="resolve-btn" data-winner="${item.to}" style="flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;font-size:14px;font-weight:700;color:var(--white);transition:all .15s">
+          ${avatarDiv(toM, 36)}<span style="margin-top:6px;display:block">${toM.name}</span>
+        </button>
+      </div>
+    `;
+  } else if (type === 'quest' || type === 'bounty') {
+    const label = type === 'quest' ? 'Quest' : 'Bounty';
+    html = `
+      <div class="modal-title">🏆 Award ${label}</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:20px;line-height:1.4">${item.title}</div>
+      <label class="modal-label">Award ${cbNum(item.reward || item.reward)} to</label>
+      <div class="member-picker" id="award-picker">
+        ${appData.members.map(m => `
+          <div class="member-pick-item" data-id="${m.id}">
+            <div class="member-avatar" style="background:${m.color};width:40px;height:40px;font-size:13px">${m.initials}</div>
+            <span>${m.name}</span>
+          </div>`).join('')}
+      </div>
+      <button class="modal-submit" id="do-award">Award</button>
+    `;
+  }
+
+  document.getElementById('modal-content').innerHTML = html;
+
+  if (type === 'bet') {
+    document.querySelectorAll('.resolve-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const winnerId = parseInt(btn.dataset.winner);
+        const loserId  = winnerId === item.from ? item.to : item.from;
+        const winner   = appData.members.find(m => m.id === winnerId);
+        const loser    = appData.members.find(m => m.id === loserId);
+        if (winner) winner.balance += item.amount;
+        if (loser)  loser.balance  = Math.max(0, loser.balance - item.amount);
+        item.status = 'resolved';
+        appData.feed.unshift({
+          id: Date.now(), from: loserId, to: winnerId,
+          amount: item.amount, desc: `Bet resolved: "${item.title}"`,
+          type: 'bet', time: 'just now',
+        });
+        closeModal();
+        renderAll();
+        if (state.mktView === 'list') renderMarketItems(state.mktType);
+        saveToGist();
+        showToast(`${getMember(winnerId).name} wins the bet!`);
+      });
+    });
+  }
+
+  if (type === 'quest' || type === 'bounty') {
+    let awardTo = null;
+    document.getElementById('award-picker')?.querySelectorAll('.member-pick-item').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('#award-picker .member-pick-item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        awardTo = parseInt(el.dataset.id);
+      });
+    });
+    document.getElementById('do-award')?.addEventListener('click', () => {
+      if (!awardTo) { showToast('Pick a winner'); return; }
+      const reward  = item.reward;
+      const winner  = appData.members.find(m => m.id === awardTo);
+      if (winner) winner.balance += reward;
+      item.status = 'claimed';
+      appData.feed.unshift({
+        id: Date.now(), from: null, to: awardTo,
+        amount: reward, desc: `${type === 'quest' ? 'Quest' : 'Bounty'} won: "${item.title}"`,
+        type, time: 'just now',
+      });
+      closeModal();
+      renderAll();
+      if (state.mktView === 'list') renderMarketItems(state.mktType);
+      saveToGist();
+      showToast(`${winner.name} awarded ${reward} ᴄʙ!`);
+    });
+  }
+
+  openModal();
+}
 
 function openSendModal() {
   const others = appData.members.filter(m => m.id !== ME);
@@ -750,7 +1013,9 @@ async function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  document.getElementById('btnSend').addEventListener('click', openSendModal);
+  document.getElementById('btnSend').addEventListener('click', () => {
+    isAdmin() ? openAdminMintModal() : openSendModal();
+  });
   document.getElementById('btnSignOut').addEventListener('click', signOut);
 
   document.getElementById('btnBack').addEventListener('click', () => {

@@ -169,6 +169,30 @@ input, textarea, select { font: inherit; }
   text-align: center;
 }
 
+/* ── Admin login card (full-width, below member grid) ── */
+.login-admin-card {
+  grid-column: 1 / -1; /* spans all 3 columns */
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--s1);
+  border: 1.5px solid rgba(245, 197, 66, 0.35);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: background 0.12s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  margin-top: 4px;
+}
+.login-admin-card:active { background: var(--s2); transform: scale(0.97); }
+
+.login-admin-icon  { font-size: 32px; line-height: 1; flex-shrink: 0; }
+.login-admin-label { font-size: 16px; font-weight: 700; color: var(--gold); }
+.login-admin-sub   { font-size: 11px; color: var(--gray1); margin-top: 2px; font-weight: 500; letter-spacing: 0.3px; }
+
+.login-admin-label,
+.login-admin-sub { display: block; }
+
 /* ── Loading state on login ── */
 .login-loading {
   color: var(--gray1);
@@ -965,6 +989,66 @@ input, textarea, select { font: inherit; }
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ═══════════════════════════════════════
+   ADMIN PANEL
+═══════════════════════════════════════ */
+
+.admin-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px 20px;
+  text-align: center;
+}
+.admin-hero-icon  { font-size: 56px; line-height: 1; margin-bottom: 10px; }
+.admin-hero-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--gold); }
+.admin-hero-sub   { font-size: 13px; color: var(--gray1); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+
+.admin-member-list { display: flex; flex-direction: column; gap: 8px; }
+
+.admin-member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+}
+.admin-rank        { font-size: 15px; width: 26px; flex-shrink: 0; text-align: center; }
+.admin-member-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--white); }
+.admin-member-bal  { font-size: 14px; font-weight: 800; color: var(--gold); white-space: nowrap; margin-right: 4px; }
+
+.admin-give-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  background: var(--gold);
+  padding: 5px 12px;
+  border-radius: 50px;
+  flex-shrink: 0;
+  transition: opacity 0.1s;
+}
+.admin-give-btn:active { opacity: 0.7; }
+
+.admin-action-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  background: rgba(245, 197, 66, 0.1);
+  border: 1px solid rgba(245, 197, 66, 0.3);
+  padding: 5px 11px;
+  border-radius: 50px;
+  flex-shrink: 0;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+.admin-action-btn:active { background: rgba(245, 197, 66, 0.2); }
+
+/* resolve modal side-by-side buttons */
+.resolve-btn { text-align: center; }
+.resolve-btn:active { opacity: 0.7; }
 
 /* ═══════════════════════════════════════
    ANIMATIONS
