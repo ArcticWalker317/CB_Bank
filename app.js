@@ -267,19 +267,27 @@ function showLoginScreen() {
     </button>
   `;
 
+  function doLogin(id) {
+    setCookie('cbbank_me', id, 365);
+    ME = id;
+    const loginEl = document.getElementById('screen-login');
+    loginEl.classList.add('fade-out');
+    setTimeout(() => {
+      loginEl.classList.add('hidden');
+      loginEl.classList.remove('fade-out');
+      document.getElementById('app').classList.remove('hidden');
+      renderAll();
+    }, 340);
+  }
+
   grid.querySelectorAll('.login-member-card, .login-admin-card').forEach(card => {
     card.addEventListener('click', () => {
       const id = parseInt(card.dataset.id);
-      setCookie('cbbank_me', id, 365);
-      ME = id;
-      const loginEl = document.getElementById('screen-login');
-      loginEl.classList.add('fade-out');
-      setTimeout(() => {
-        loginEl.classList.add('hidden');
-        loginEl.classList.remove('fade-out');
-        document.getElementById('app').classList.remove('hidden');
-        renderAll();
-      }, 340);
+      if (id === ADMIN_ID) {
+        const pw = prompt('Enter admin password:');
+        if (pw !== 'WeAre67') { showToast('Wrong password'); return; }
+      }
+      doLogin(id);
     });
   });
 
