@@ -248,6 +248,69 @@ async function saveToGist() {
 }
 
 /* ─────────────────────────────────────
+   PIN OVERLAY
+───────────────────────────────────── */
+
+const ADMIN_PIN = '6767';
+
+function showPinOverlay(onSuccess) {
+  let entered = '';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'pin-overlay';
+  overlay.innerHTML = `
+    <div class="pin-wrap">
+      <div class="pin-bank-icon">🏦</div>
+      <div class="pin-title">Bank Admin</div>
+      <div class="pin-subtitle">Enter Passcode</div>
+      <div class="pin-dots">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+      </div>
+      <div class="pin-pad">
+        ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="pin-key" data-n="${n}">${n}</button>`).join('')}
+        <button class="pin-key pin-key-cancel" id="pin-cancel">Cancel</button>
+        <button class="pin-key" data-n="0">0</button>
+        <div></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const dots = overlay.querySelectorAll('.pin-dot');
+  const dotsWrap = overlay.querySelector('.pin-dots');
+
+  function updateDots() {
+    dots.forEach((d, i) => d.classList.toggle('filled', i < entered.length));
+  }
+
+  function shake() {
+    dotsWrap.classList.add('shake');
+    dotsWrap.addEventListener('animationend', () => dotsWrap.classList.remove('shake'), { once: true });
+    entered = '';
+    updateDots();
+  }
+
+  overlay.addEventListener('click', e => {
+    if (e.target.closest('#pin-cancel')) { overlay.remove(); return; }
+    const key = e.target.closest('[data-n]');
+    if (key && entered.length < 4) {
+      entered += key.dataset.n;
+      updateDots();
+      if (entered.length === 4) {
+        if (entered === ADMIN_PIN) {
+          setTimeout(() => { overlay.remove(); onSuccess(); }, 150);
+        } else {
+          setTimeout(shake, 150);
+        }
+      }
+    }
+  });
+}
+
+/* ─────────────────────────────────────
    AUTH
 ───────────────────────────────────── */
 
@@ -284,10 +347,10 @@ function showLoginScreen() {
     card.addEventListener('click', () => {
       const id = parseInt(card.dataset.id);
       if (id === ADMIN_ID) {
-        const pw = prompt('Enter admin password:');
-        if (pw !== 'WeAre67') { showToast('Wrong password'); return; }
+        showPinOverlay(() => doLogin(id));
+      } else {
+        doLogin(id);
       }
-      doLogin(id);
     });
   });
 
