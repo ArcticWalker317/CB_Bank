@@ -812,7 +812,7 @@ function renderProfile() {
       </div>
       <div class="profile-name">${me.name}</div>
       <div class="profile-balance">${me.balance}</div>
-      <div class="profile-balance-label"><span class="cb-mark">ᴄʙ</span> cool bucks</div>
+      <div class="profile-balance-label">cool bucks</div>
     </div>
 
     <div class="profile-stats">
