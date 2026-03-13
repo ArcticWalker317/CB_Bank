@@ -56,6 +56,7 @@ body {
   background: var(--bg);
   color: var(--white);
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
   overscroll-behavior: none;
   overflow: hidden;
   height: 100dvh;
@@ -188,6 +189,7 @@ input, textarea, select { font: inherit; }
   width: 56px;
   height: 56px;
   border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -769,6 +771,11 @@ input, textarea, select { font: inherit; }
   padding: 32px 24px 24px;
   text-align: center;
 }
+.profile-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  margin-bottom: 12px;
+}
 .profile-avatar {
   width: 78px;
   height: 78px;
@@ -782,6 +789,70 @@ input, textarea, select { font: inherit; }
   color: #fff;
   margin-bottom: 14px;
   box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--gold);
+}
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--s2);
+  border: 2px solid var(--bg);
+  color: var(--gray1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.avatar-edit-btn:active { opacity: 0.6; }
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 8px 0 4px;
+}
+.color-swatch {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.color-swatch:active  { transform: scale(0.9); }
+.color-swatch.selected { border-color: #fff; }
+.avatar-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+.avatar-upload-btn:active { opacity: 0.7; }
+.avatar-divider {
+  text-align: center;
+  font-size: 11px;
+  color: var(--gray2);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+  margin: 14px 0 10px;
 }
 .profile-name {
   font-size: 18px;
@@ -861,31 +932,39 @@ input, textarea, select { font: inherit; }
   color: var(--gray2);
   margin-bottom: 14px;
 }
-.bar-chart {
+.chart-header {
   display: flex;
-  align-items: flex-end;
-  gap: 5px;
-  height: 72px;
-}
-.bar-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 5px;
-  height: 100%;
-  justify-content: flex-end;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
-.bar {
-  width: 100%;
-  border-radius: 4px 4px 0 0;
-  background: var(--s3);
-  min-height: 4px;
-  transition: height 0.5s ease;
+.period-picker {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 3px;
 }
-.bar.today { background: var(--gold); }
-.bar-day { font-family: var(--font-mono); font-size: 9px; color: var(--gray2); font-weight: 600; }
-.bar-col.today .bar-day { color: var(--gold-txt); font-weight: 700; }
+.period-btn {
+  background: transparent;
+  border: none;
+  color: var(--gray1);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.period-btn.active {
+  background: var(--s2);
+  color: var(--gold);
+}
+.lc-svg        { width: 100%; height: auto; display: block; overflow: visible; }
+.lc-xlabel     { font-size: 10px; fill: #8E8E93; font-weight: 600; font-family: inherit; }
+.lc-xlabel-now { fill: #F5C542; font-weight: 700; }
 
 .profile-section { margin: 0 14px 14px; }
 .profile-section-header {
@@ -1129,6 +1208,90 @@ input, textarea, select { font: inherit; }
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ═══════════════════════════════════════
+   PIN OVERLAY
+═══════════════════════════════════════ */
+
+#pin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeUp 0.2s ease;
+}
+
+.pin-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  padding: 0 32px;
+  gap: 0;
+}
+
+.pin-bank-icon  { font-size: 44px; line-height: 1; margin-bottom: 14px; }
+.pin-title      { font-size: 22px; font-weight: 800; color: #F5C542; letter-spacing: -0.5px; margin-bottom: 4px; }
+.pin-subtitle   { font-size: 14px; color: #8E8E93; margin-bottom: 32px; }
+
+.pin-dots {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+.pin-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid #8E8E93;
+  transition: background 0.12s, border-color 0.12s;
+}
+.pin-dot.filled {
+  background: #F5C542;
+  border-color: #F5C542;
+}
+
+.pin-dots.shake { animation: pinShake 0.45s ease; }
+@keyframes pinShake {
+  0%,100% { transform: translateX(0); }
+  18%     { transform: translateX(-10px); }
+  36%     { transform: translateX(10px); }
+  54%     { transform: translateX(-8px); }
+  72%     { transform: translateX(6px); }
+  88%     { transform: translateX(-3px); }
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 14px;
+  justify-content: center;
+}
+.pin-key {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #1C1C1E;
+  border: none;
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: opacity 0.1s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pin-key:active { opacity: 0.45; transform: scale(0.93); }
+.pin-key-cancel { background: transparent; font-size: 15px; color: #8E8E93; }
+.pin-key-del    { background: transparent; font-size: 22px; color: #ffffff; }
 
 /* ═══════════════════════════════════════
    ADMIN PANEL
