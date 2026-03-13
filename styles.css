@@ -38,7 +38,7 @@
 html { font-size: 16px; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-  background: var(--bg);
+  background: #000;
   color: var(--white);
   -webkit-text-size-adjust: 100%;
   overscroll-behavior: none;
@@ -53,13 +53,134 @@ button {
 }
 input, textarea, select { font: inherit; }
 
+/* ── Global hidden ── */
+.hidden { display: none !important; }
+
 /* ── Desktop centering ── */
 @media (min-width: 430px) {
-  body { display: flex; justify-content: center; background: #000; }
+  body { display: flex; justify-content: center; }
+  #screen-login,
   #app { max-width: 430px; width: 100%; border: 1px solid var(--border); }
 }
 
-/* ── App Shell ── */
+/* ═══════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════ */
+
+#screen-login {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 35%, #1A1200 0%, #0A0A0A 65%);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: env(safe-area-inset-top, 24px) 20px env(safe-area-inset-bottom, 24px);
+  overflow-y: auto;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+#screen-login.fade-out {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+}
+
+.login-wrap {
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0 20px;
+}
+
+.login-logo {
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.login-logo .cb-mark {
+  text-shadow: 0 0 40px rgba(245, 197, 66, 0.55), 0 0 80px rgba(245, 197, 66, 0.2);
+}
+
+.login-sub {
+  font-size: 14px;
+  color: var(--gray1);
+  font-weight: 500;
+  margin-bottom: 40px;
+  letter-spacing: 0.1px;
+}
+
+.login-who {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--gray2);
+  margin-bottom: 14px;
+  align-self: flex-start;
+}
+
+.login-member-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.login-member-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 8px 14px;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: background 0.12s, transform 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.login-member-card:active {
+  background: var(--s2);
+  transform: scale(0.94);
+  border-color: rgba(245, 197, 66, 0.4);
+}
+
+.login-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+}
+
+.login-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--white);
+  text-align: center;
+}
+
+/* ── Loading state on login ── */
+.login-loading {
+  color: var(--gray1);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 24px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════ */
+
 #app {
   display: flex;
   flex-direction: column;
@@ -67,7 +188,9 @@ input, textarea, select { font: inherit; }
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background: var(--bg);
 }
+#app.hidden { display: none !important; }
 
 /* ── Tab Panes ── */
 .tab-pane {
@@ -117,7 +240,7 @@ input, textarea, select { font: inherit; }
   color: var(--gold);
 }
 
-/* ── Ghost Button (Send) ── */
+/* ── Ghost Button ── */
 .btn-ghost {
   font-size: 13px;
   font-weight: 600;
@@ -126,6 +249,7 @@ input, textarea, select { font: inherit; }
   border: 1.5px solid rgba(245, 197, 66, 0.4);
   border-radius: 50px;
   transition: background 0.15s;
+  white-space: nowrap;
 }
 .btn-ghost:active { background: var(--gold-dim); }
 
@@ -133,7 +257,6 @@ input, textarea, select { font: inherit; }
    FEED TAB
 ═══════════════════════════════════════ */
 
-/* ── Members Strip ── */
 .members-strip {
   display: flex;
   gap: 10px;
@@ -226,11 +349,7 @@ input, textarea, select { font: inherit; }
   flex-shrink: 0;
 }
 .feed-avatar + .feed-avatar { margin-left: -7px; }
-.feed-arrow {
-  font-size: 11px;
-  color: var(--gray2);
-  margin: 0 1px;
-}
+.feed-arrow { font-size: 11px; color: var(--gray2); margin: 0 1px; }
 
 .feed-body { flex: 1; min-width: 0; }
 .feed-desc {
@@ -296,9 +415,7 @@ input, textarea, select { font: inherit; }
   overflow: hidden;
   min-height: 0;
 }
-.hidden { display: none !important; }
 
-/* ── Market Home Scroll ── */
 .mkt-scroll-area {
   flex: 1;
   overflow-y: auto;
@@ -332,7 +449,6 @@ input, textarea, select { font: inherit; }
 }
 .mkt-type-card:active { transform: scale(0.96); background: var(--s2); }
 
-/* Colored top strip */
 .mkt-type-card::before {
   content: '';
   position: absolute;
@@ -350,25 +466,12 @@ input, textarea, select { font: inherit; }
 .type-bet      { border-color: rgba(191,90,242,0.2);  }
 .type-offering { border-color: rgba(10,132,255,0.2);  }
 
-.mkt-type-icon {
-  font-size: 30px;
-  line-height: 1;
-  margin-top: 4px;
-}
-.mkt-type-name {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-}
-.mkt-type-desc {
-  font-size: 11.5px;
-  color: var(--gray1);
-  line-height: 1.4;
-}
+.mkt-type-icon  { font-size: 30px; line-height: 1; margin-top: 4px; }
+.mkt-type-name  { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.mkt-type-desc  { font-size: 11.5px; color: var(--gray1); line-height: 1.4; }
 .mkt-count {
   position: absolute;
-  top: 11px;
-  right: 12px;
+  top: 11px; right: 12px;
   background: var(--s3);
   color: var(--gray1);
   font-size: 11px;
@@ -483,7 +586,6 @@ input, textarea, select { font: inherit; }
   flex-shrink: 0;
 }
 
-/* ── Status Tags ── */
 .status-tag {
   font-size: 10.5px;
   font-weight: 700;
@@ -499,11 +601,10 @@ input, textarea, select { font: inherit; }
 .status-available { background: rgba(10,132,255,0.15); color: var(--blue);   }
 .status-yours     { background: rgba(245,197,66,0.15); color: var(--gold);   }
 
-.vs-divider { font-size: 10px; color: var(--gray2); font-weight: 700; }
+.vs-divider   { font-size: 10px; color: var(--gray2); font-weight: 700; }
 .deadline-tag { font-size: 11px; color: var(--orange); font-weight: 600; }
-.adj-tag { font-size: 11px; color: var(--gray2); margin-top: 8px; }
+.adj-tag      { font-size: 11px; color: var(--gray2); margin-top: 8px; }
 
-/* ── Buy Button ── */
 .buy-btn {
   font-size: 13px;
   font-weight: 700;
@@ -529,7 +630,6 @@ input, textarea, select { font: inherit; }
 }
 .profile-body::-webkit-scrollbar { display: none; }
 
-/* ── Hero ── */
 .profile-hero {
   display: flex;
   flex-direction: column;
@@ -570,7 +670,6 @@ input, textarea, select { font: inherit; }
   font-weight: 500;
 }
 
-/* ── Stats Row ── */
 .profile-stats {
   display: flex;
   margin: 0 14px 14px;
@@ -593,7 +692,7 @@ input, textarea, select { font: inherit; }
   letter-spacing: -0.5px;
 }
 .stat-value.green { color: var(--green); }
-.stat-value.red   { color: var(--red); }
+.stat-value.red   { color: var(--red);   }
 .stat-label {
   font-size: 10.5px;
   color: var(--gray1);
@@ -603,7 +702,6 @@ input, textarea, select { font: inherit; }
   letter-spacing: 0.4px;
 }
 
-/* ── Balance Chart ── */
 .chart-section {
   margin: 0 14px 14px;
   background: var(--s1);
@@ -642,14 +740,9 @@ input, textarea, select { font: inherit; }
   transition: height 0.5s ease;
 }
 .bar.today { background: var(--gold); }
-.bar-day {
-  font-size: 9.5px;
-  color: var(--gray2);
-  font-weight: 600;
-}
+.bar-day { font-size: 9.5px; color: var(--gray2); font-weight: 600; }
 .bar-col.today .bar-day { color: var(--gold); }
 
-/* ── Profile Sections ── */
 .profile-section { margin: 0 14px 14px; }
 .profile-section-header {
   font-size: 11px;
@@ -672,19 +765,9 @@ input, textarea, select { font: inherit; }
   align-items: center;
   gap: 10px;
 }
-.offering-row-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--white);
-}
-.offering-row-price {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--gold);
-  white-space: nowrap;
-}
+.offering-row-title  { font-size: 14px; font-weight: 500; color: var(--white); }
+.offering-row-price  { font-size: 15px; font-weight: 800; color: var(--gold); white-space: nowrap; }
 
-/* ── Empty State ── */
 .empty-state {
   text-align: center;
   padding: 28px;
@@ -720,11 +803,7 @@ input, textarea, select { font: inherit; }
   transition: color 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.nav-item span {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1px;
-}
+.nav-item span  { font-size: 10px; font-weight: 600; letter-spacing: 0.1px; }
 .nav-item.active { color: var(--gold); }
 .nav-item:active { opacity: 0.5; }
 
@@ -772,24 +851,9 @@ input, textarea, select { font: inherit; }
   margin: 12px auto 6px;
 }
 
-#modal-content { padding: 6px 20px 12px; }
-
-.modal-title {
-  font-size: 22px;
-  font-weight: 800;
-  margin-bottom: 22px;
-  letter-spacing: -0.5px;
-}
-
-.modal-label {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--gray1);
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 7px;
-}
+#modal-content  { padding: 6px 20px 12px; }
+.modal-title    { font-size: 22px; font-weight: 800; margin-bottom: 22px; letter-spacing: -0.5px; }
+.modal-label    { display: block; font-size: 11.5px; font-weight: 600; color: var(--gray1); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 7px; }
 
 .modal-input {
   display: block;
@@ -798,7 +862,7 @@ input, textarea, select { font: inherit; }
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   padding: 13px 14px;
-  font-size: 16px;  /* 16px prevents iOS auto-zoom */
+  font-size: 16px;
   color: var(--white);
   margin-bottom: 14px;
   outline: none;
@@ -824,7 +888,6 @@ input, textarea, select { font: inherit; }
 }
 .modal-submit:active { opacity: 0.8; transform: scale(0.98); }
 
-/* ── Type Selector (create modal) ── */
 .type-selector {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -844,14 +907,9 @@ input, textarea, select { font: inherit; }
   transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.type-option.selected {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: var(--gold-dim);
-}
-.type-option:active { opacity: 0.7; }
+.type-option.selected { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+.type-option:active   { opacity: 0.7; }
 
-/* ── Member Picker (send modal) ── */
 .member-picker {
   display: flex;
   gap: 8px;
@@ -875,16 +933,9 @@ input, textarea, select { font: inherit; }
   -webkit-tap-highlight-color: transparent;
   min-width: 60px;
 }
-.member-pick-item.selected {
-  border-color: var(--gold);
-  background: var(--gold-dim);
-}
-.member-pick-item span {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gray1);
-}
-.member-pick-item.selected span { color: var(--gold); }
+.member-pick-item.selected             { border-color: var(--gold); background: var(--gold-dim); }
+.member-pick-item span                 { font-size: 11px; font-weight: 600; color: var(--gray1); }
+.member-pick-item.selected span        { color: var(--gold); }
 
 /* ═══════════════════════════════════════
    TOAST
@@ -927,7 +978,7 @@ input, textarea, select { font: inherit; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.feed-card       { animation: fadeUp 0.22s ease both; }
-.mkt-item-card   { animation: fadeUp 0.2s ease both;  }
-.mkt-type-card   { animation: fadeUp 0.2s ease both;  }
-.offering-row    { animation: fadeUp 0.18s ease both; }
+.feed-card     { animation: fadeUp 0.22s ease both; }
+.mkt-item-card { animation: fadeUp 0.2s ease both;  }
+.mkt-type-card { animation: fadeUp 0.2s ease both;  }
+.offering-row  { animation: fadeUp 0.18s ease both; }

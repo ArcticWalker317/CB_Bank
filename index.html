@@ -11,9 +11,21 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="app">
 
-    <!-- ══ FEED TAB ══ -->
+  <!-- ══ LOGIN SCREEN ══ -->
+  <div id="screen-login">
+    <div class="login-wrap">
+      <div class="login-logo"><span class="cb-mark">ᴄʙ</span> Bank</div>
+      <div class="login-sub">cool bucks for cool people</div>
+      <div class="login-who">who are you?</div>
+      <div id="login-member-grid" class="login-member-grid"></div>
+    </div>
+  </div>
+
+  <!-- ══ MAIN APP (hidden until logged in) ══ -->
+  <div id="app" class="hidden">
+
+    <!-- ── FEED TAB ── -->
     <section id="tab-feed" class="tab-pane active">
       <header class="page-header">
         <h1 class="header-title"><span class="cb-mark">ᴄʙ</span> Bank</h1>
@@ -23,7 +35,7 @@
       <div id="feed-list" class="feed-list"></div>
     </section>
 
-    <!-- ══ MARKETPLACE TAB ══ -->
+    <!-- ── MARKETPLACE TAB ── -->
     <section id="tab-marketplace" class="tab-pane">
 
       <div id="mkt-home">
@@ -56,15 +68,16 @@
 
     </section>
 
-    <!-- ══ PROFILE TAB ══ -->
+    <!-- ── PROFILE TAB ── -->
     <section id="tab-profile" class="tab-pane">
       <header class="page-header">
         <h1 class="header-title">Profile</h1>
+        <button class="btn-ghost" id="btnSignOut">Sign out</button>
       </header>
       <div id="profile-body" class="profile-body"></div>
     </section>
 
-    <!-- ══ BOTTOM NAV ══ -->
+    <!-- ── BOTTOM NAV ── -->
     <nav class="bottom-nav">
       <button class="nav-item active" data-tab="feed">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -91,7 +104,7 @@
       </button>
     </nav>
 
-    <!-- ══ MODAL ══ -->
+    <!-- ── MODAL ── -->
     <div id="modal-overlay" class="modal-overlay" aria-hidden="true">
       <div class="modal-sheet" id="modal-sheet">
         <div class="modal-handle"></div>
@@ -99,10 +112,11 @@
       </div>
     </div>
 
-    <!-- ══ TOAST ══ -->
+    <!-- ── TOAST ── -->
     <div id="toast" class="toast" aria-live="polite"></div>
 
-  </div>
+  </div><!-- /#app -->
+
   <script src="app.js"></script>
 </body>
 </html>
