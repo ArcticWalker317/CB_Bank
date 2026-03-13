@@ -346,12 +346,13 @@ function renderMembersStrip() {
   const sorted = [...appData.members].sort((a, b) => b.balance - a.balance);
   document.getElementById('members-strip').innerHTML = sorted.map(m => {
     const isMe = m.id === ME;
-    const ring = isMe ? `box-shadow:0 0 0 2.5px #0A0A0A,0 0 0 4.5px #F5C542` : '';
     return `
-      <div class="member-card">
-        <div class="member-avatar" style="background:${m.color};${ring}">${m.initials}</div>
-        <div class="member-name">${isMe ? 'You' : m.name}</div>
-        <div class="member-balance">${m.balance}<span class="cb-mark" style="font-size:9px"> ᴄʙ</span></div>
+      <div class="member-card ${isMe ? 'is-me' : ''}">
+        <div class="member-avatar" style="background:${m.color}">${m.initials}</div>
+        <div>
+          <div class="member-name">${isMe ? 'You' : m.name}</div>
+          <div class="member-balance">${m.balance} ᴄʙ</div>
+        </div>
       </div>
     `;
   }).join('');
@@ -371,18 +372,22 @@ function renderFeed() {
     const amtCls = item.to === ME ? '' : (item.from === ME ? 'negative' : 'neutral');
     return `
       <div class="feed-card ${isMe ? 'highlight' : ''}" style="animation-delay:${i * 0.04}s">
-        <div class="feed-avatars">
-          ${avatarDiv(fromM, 34)}
-          <div class="feed-arrow">→</div>
-          ${avatarDiv(toM, 34)}
+        <div class="feed-card-top">
+          <div class="feed-avatars">
+            ${avatarDiv(fromM, 32)}
+            <div class="feed-arrow">→</div>
+            ${avatarDiv(toM, 32)}
+          </div>
+          <div class="feed-amount ${amtCls}">${cbNum(item.amount, sign)}</div>
         </div>
         <div class="feed-body">
-          <div class="feed-desc">
-            <span class="type-badge ${BADGE[item.type] || 'badge-system'}">${item.type}</span>${item.desc}
+          <div class="feed-desc">${item.desc}</div>
+          <div class="feed-meta">
+            <span class="type-badge ${BADGE[item.type] || 'badge-system'}">${item.type}</span>
+            <span class="feed-meta-names">${fromM.name} → ${toM.name}</span>
+            <span class="feed-meta-time">${item.time}</span>
           </div>
-          <div class="feed-meta">${fromM.name} → ${toM.name} · ${item.time}</div>
         </div>
-        <div class="feed-amount ${amtCls}">${cbNum(item.amount, sign)}</div>
       </div>
     `;
   }).join('');
