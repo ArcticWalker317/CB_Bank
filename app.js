@@ -127,10 +127,9 @@ const TYPE_META = {
 };
 
 const state = {
-  tab:         'feed',
-  mktView:     'home',
-  mktType:     null,
-  chartPeriod: 'week',
+  tab:     'feed',
+  mktView: 'home',
+  mktType: null,
 };
 
 /* ─────────────────────────────────────
@@ -714,42 +713,27 @@ function renderProfile() {
   const rank   = [...appData.members].sort((a, b) => b.balance - a.balance).findIndex(m => m.id === ME) + 1;
   const myOff  = appData.marketplace.offering.filter(o => o.by === ME);
 
-  const PERIOD_LABELS = {
-    week:    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-    month:   ['W1','W2','W3','W4'],
-    year:    ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-    allTime: ['M1','M2','M3','M4','M5','M6'],
-  };
-
   const rawHist = (appData.balanceHistory || {})[ME] || {};
-  // backward-compat: if stored as flat array, treat as week
-  const histByPeriod = Array.isArray(rawHist) ? { week: rawHist, month: [], year: [], allTime: [] } : rawHist;
+  const weekHist = Array.isArray(rawHist) ? rawHist : (rawHist.week || []);
+  const WEEK_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
-  function buildChart(period) {
-    const hist   = histByPeriod[period] || [];
-    const labels = PERIOD_LABELS[period] || [];
+  function buildChart() {
+    const hist = weekHist;
     if (!hist.length) return '<div class="empty-state" style="padding:24px 0">No data yet</div>';
-
     const VW = 300, VH = 100;
     const mt = 8, mb = 20, ml = 4, mr = 4;
     const cw = VW - ml - mr, ch = VH - mt - mb;
     const minV = Math.min(...hist);
     const maxV = Math.max(...hist, minV + 1);
     const n = hist.length;
-
     const px = i => ml + (n === 1 ? cw / 2 : (i / (n - 1)) * cw);
     const py = v => mt + (1 - (v - minV) / (maxV - minV)) * ch;
-
     const pts  = hist.map((v, i) => `${px(i)},${py(v)}`).join(' ');
     const area = `${px(0)},${mt + ch} ${pts} ${px(n-1)},${mt + ch}`;
     const lx = px(n - 1), ly = py(hist[n - 1]);
-
-    const xLabels = hist.map((_, i) => {
-      const isLast = i === n - 1;
-      const lbl = labels[i] ?? '';
-      return `<text x="${px(i)}" y="${VH - 3}" text-anchor="middle" class="lc-xlabel${isLast ? ' lc-xlabel-now' : ''}">${lbl}</text>`;
-    }).join('');
-
+    const xLabels = hist.map((_, i) => `
+      <text x="${px(i)}" y="${VH - 3}" text-anchor="middle" class="lc-xlabel${i === n-1 ? ' lc-xlabel-now' : ''}">${WEEK_LABELS[i] ?? ''}</text>
+    `).join('');
     return `
       <svg class="lc-svg" viewBox="0 0 ${VW} ${VH}">
         <defs>
@@ -807,16 +791,8 @@ function renderProfile() {
     </div>
 
     <div class="chart-section">
-      <div class="chart-header">
-        <div class="section-label" style="margin-bottom:0">Balance History</div>
-        <div class="period-picker">
-          ${['week','month','year','allTime'].map(p => `
-            <button class="period-btn${state.chartPeriod === p ? ' active' : ''}" data-period="${p}">
-              ${{ week:'1W', month:'1M', year:'1Y', allTime:'All' }[p]}
-            </button>`).join('')}
-        </div>
-      </div>
-      <div id="chart-area">${buildChart(state.chartPeriod)}</div>
+      <div class="section-label">Balance History</div>
+      ${buildChart()}
     </div>
 
     <div class="profile-section">
@@ -833,14 +809,6 @@ function renderProfile() {
       ${recentRows || '<div class="empty-state">No transactions yet</div>'}
     </div>
   `;
-
-  document.querySelectorAll('.period-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.chartPeriod = btn.dataset.period;
-      document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b === btn));
-      document.getElementById('chart-area').innerHTML = buildChart(state.chartPeriod);
-    });
-  });
 
   document.getElementById('btnEditAvatar').addEventListener('click', openAvatarEditModal);
 }
