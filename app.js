@@ -3,32 +3,17 @@
 ═══════════════════════════════════════ */
 
 /* ─────────────────────────────────────
-   SETUP: GitHub Gist as database
-
-   1. Go to github.com → Settings → Developer settings
-      → Personal access tokens → Tokens (classic)
-      → Generate new token → check ONLY "gist" scope
-      Copy the token (starts with ghp_...)
-
-   2. Go to gist.github.com → New gist
-      - Filename: cbbank-data.json
-      - Content: paste the JSON from DEFAULT_DATA below
-      - Set to "Secret" gist → Create gist
-      Copy the Gist ID from the URL
-      (the long hash after your username, e.g. /username/abc123def456...)
-
-   3. Fill in GIST_ID and GITHUB_TOKEN below.
-
-   The token only has "gist" scope — if it ever leaks,
-   no other GitHub data is at risk.
+   FIREBASE INIT
+   config.js (gitignored) provides window.CB_CONFIG
 ───────────────────────────────────── */
-//THE GIST TOKEN EXPIRATION DATE IS 10/13/2026
-// config.js (gitignored) can override these via window.CB_CONFIG
-const CONFIG = {
-  GIST_ID:       (window.CB_CONFIG || {}).GIST_ID       || '',
-  GITHUB_TOKEN:  (window.CB_CONFIG || {}).GITHUB_TOKEN   || '',
-  GIST_FILENAME: 'cbbank-data.json',
-};
+
+let db;
+(function initFirebase() {
+  const cfg = window.CB_CONFIG || {};
+  if (!cfg.apiKey) return;
+  firebase.initializeApp(cfg);
+  db = firebase.firestore();
+})();
 
 /* ─────────────────────────────────────
    DEFAULT DATA
@@ -167,7 +152,7 @@ function deleteCookie(name) {
 }
 
 /* ─────────────────────────────────────
-   GIST DATA STORE
+   FIREBASE DATA STORE
 ───────────────────────────────────── */
 
 function isValidData(d) {
@@ -176,80 +161,83 @@ function isValidData(d) {
       && d.marketplace && typeof d.marketplace === 'object';
 }
 
-async function loadFromGist() {
-  // No Gist configured — try localStorage cache, then fall back to defaults
-  if (!CONFIG.GIST_ID) {
+const DATA_DOC    = () => db.collection('cbbank').doc('data');
+const AVATAR_DOC  = () => db.collection('cbbank').doc('avatars');
+
+// Avatars live in their own Firestore document so they never slow down normal saves
+let avatarData = {};
+
+async function loadFromFirebase() {
+  if (!db) {
     const cached = localStorage.getItem('cbbank-cache');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (isValidData(parsed)) appData = parsed;
-      } catch (_) {}
-    }
+    if (cached) { try { const p = JSON.parse(cached); if (isValidData(p)) appData = p; } catch(_){} }
+    const cachedAv = localStorage.getItem('cbbank-avatars');
+    if (cachedAv) { try { avatarData = JSON.parse(cachedAv); } catch(_){} }
     return;
   }
-
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000); // 6s timeout
-
-    const res = await fetch(`https://api.github.com/gists/${CONFIG.GIST_ID}`, {
-      signal: controller.signal,
-      headers: {
-        Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
-    clearTimeout(timeout);
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const gist = await res.json();
-    const raw  = gist.files[CONFIG.GIST_FILENAME]?.content;
-    if (!raw) throw new Error('file not found in gist');
-
-    const parsed = JSON.parse(raw);
-    if (!isValidData(parsed)) throw new Error('gist data missing required fields');
-
-    appData = parsed;
-    localStorage.setItem('cbbank-cache', raw); // update offline cache
-  } catch (err) {
-    console.warn('Gist load failed, trying local cache:', err);
-    const cached = localStorage.getItem('cbbank-cache');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (isValidData(parsed)) appData = parsed;
-      } catch (_) {}
+    const [dataSnap, avSnap] = await Promise.all([DATA_DOC().get(), AVATAR_DOC().get()]);
+    if (dataSnap.exists && isValidData(dataSnap.data())) {
+      appData = dataSnap.data();
+      localStorage.setItem('cbbank-cache', JSON.stringify(appData));
+    } else if (!dataSnap.exists) {
+      await DATA_DOC().set(DEFAULT_DATA);
     }
-    // Otherwise appData stays as DEFAULT_DATA (always valid)
+    if (avSnap.exists) {
+      avatarData = avSnap.data();
+      localStorage.setItem('cbbank-avatars', JSON.stringify(avatarData));
+    }
+  } catch (err) {
+    console.warn('Firebase load failed, using local cache:', err);
+    const cached = localStorage.getItem('cbbank-cache');
+    if (cached) { try { const p = JSON.parse(cached); if (isValidData(p)) appData = p; } catch(_){} }
+    const cachedAv = localStorage.getItem('cbbank-avatars');
+    if (cachedAv) { try { avatarData = JSON.parse(cachedAv); } catch(_){} }
   }
 }
 
-async function saveToGist() {
-  const raw = JSON.stringify(appData, null, 2);
-  localStorage.setItem('cbbank-cache', raw); // always persist locally first
+let _unsubData = null, _unsubAv = null;
+function startListening() {
+  if (!db) return;
+  if (!_unsubData) {
+    _unsubData = DATA_DOC().onSnapshot(snap => {
+      if (!snap.exists || !isValidData(snap.data())) return;
+      appData = snap.data();
+      localStorage.setItem('cbbank-cache', JSON.stringify(appData));
+      if (ME !== null) renderAll();
+    }, err => console.warn('Firestore data listener error:', err));
+  }
+  if (!_unsubAv) {
+    _unsubAv = AVATAR_DOC().onSnapshot(snap => {
+      if (!snap.exists) return;
+      avatarData = snap.data();
+      localStorage.setItem('cbbank-avatars', JSON.stringify(avatarData));
+      if (ME !== null) renderAll();
+    }, err => console.warn('Firestore avatar listener error:', err));
+  }
+}
 
-  if (!CONFIG.GIST_ID || !CONFIG.GITHUB_TOKEN) return;
-
+// Normal save — only writes main data doc (no avatars, stays small)
+async function saveToFirebase() {
+  localStorage.setItem('cbbank-cache', JSON.stringify(appData));
+  if (!db) return;
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 12000); // 12s timeout for saves
-    await fetch(`https://api.github.com/gists/${CONFIG.GIST_ID}`, {
-      method: 'PATCH',
-      signal: ctrl.signal,
-      headers: {
-        Authorization: `token ${CONFIG.GITHUB_TOKEN}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/vnd.github.v3+json',
-      },
-      body: JSON.stringify({
-        files: { [CONFIG.GIST_FILENAME]: { content: raw } },
-      }),
-    });
-    clearTimeout(t);
+    await DATA_DOC().set(appData);
   } catch (err) {
-    console.warn('Gist save failed (data is saved locally):', err);
+    console.warn('Firebase save failed:', err);
     showToast('Saved locally — will sync when back online');
+  }
+}
+
+// Avatar save — writes ONLY to the avatars doc, never touches main data
+async function saveAvatarToFirebase() {
+  localStorage.setItem('cbbank-avatars', JSON.stringify(avatarData));
+  if (!db) return;
+  try {
+    await AVATAR_DOC().set(avatarData);
+  } catch (err) {
+    console.warn('Avatar save failed:', err);
+    showToast('Photo saved locally — will sync when back online');
   }
 }
 
@@ -389,11 +377,7 @@ function getMember(id) {
 }
 
 function getAvatar(memberId) {
-  // Check new dedicated avatars store first, then fall back to legacy m.avatar
-  const fromStore = (appData.avatars || {})[String(memberId)];
-  if (fromStore) return fromStore;
-  const m = appData.members.find(m => m.id === memberId);
-  return m?.avatar || null;
+  return avatarData[String(memberId)] || null;
 }
 
 function avatarDiv(member, size = 36) {
@@ -619,7 +603,7 @@ function renderMarketItems(type) {
         appData.marketplace.offering.splice(idx, 1);
         renderMarketItems('offering');
         renderMarketGrid();
-        saveToGist();
+        saveToFirebase();
         showToast('Offering removed');
       }
     });
@@ -644,7 +628,7 @@ function handleBuyOffering(offeringId, price, sellerId) {
 
   renderAll();
   showMarketList('offering');
-  saveToGist();
+  saveToFirebase();
   showToast(`Bought "${item.title}" from ${getMember(sellerId).name}! 🎉`);
 }
 
@@ -699,10 +683,10 @@ function openAvatarEditModal() {
   document.getElementById('avatarFileInput').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
-    resizeImageToDataURL(file, 120, 0.65, dataURL => {
-      if (!appData.avatars) appData.avatars = {};
-      appData.avatars[String(ME)] = dataURL;
-      saveToGist();
+    showToast('Uploading…');
+    resizeImageToDataURL(file, 120, 0.65, async dataURL => {
+      avatarData[String(ME)] = dataURL;
+      await saveAvatarToFirebase();
       closeModal();
       renderAll();
     });
@@ -711,8 +695,9 @@ function openAvatarEditModal() {
   document.querySelectorAll('.color-swatch').forEach(sw => {
     sw.addEventListener('click', () => {
       me.color = sw.dataset.color;
-      if (appData.avatars) delete appData.avatars[String(ME)];
-      saveToGist();
+      delete avatarData[String(ME)];
+      saveAvatarToFirebase();
+      saveToFirebase();
       closeModal();
       renderAll();
     });
@@ -969,7 +954,7 @@ function openAdminMintModal(preselectedId = null) {
 
     closeModal();
     renderAll();
-    saveToGist();
+    saveToFirebase();
     showToast(`Minted ${amount} ᴄʙ → ${receiver.name}`);
   });
 
@@ -1032,7 +1017,7 @@ function openAdminResolveModal(item, type) {
         closeModal();
         renderAll();
         if (state.mktView === 'list') renderMarketItems(state.mktType);
-        saveToGist();
+        saveToFirebase();
         showToast(`${getMember(winnerId).name} wins the bet!`);
       });
     });
@@ -1061,7 +1046,7 @@ function openAdminResolveModal(item, type) {
       closeModal();
       renderAll();
       if (state.mktView === 'list') renderMarketItems(state.mktType);
-      saveToGist();
+      saveToFirebase();
       showToast(`${winner.name} awarded ${reward} ᴄʙ!`);
     });
   }
@@ -1118,7 +1103,7 @@ function openSendModal() {
 
     closeModal();
     renderAll();
-    saveToGist();
+    saveToFirebase();
     showToast(`Sent ${amount} ᴄʙ to ${receiver.name}! 💸`);
   });
 
@@ -1174,7 +1159,7 @@ function openCreateModal(preType = null) {
     closeModal();
     renderMarketGrid();
     if (state.mktView === 'list' && state.mktType === selectedType) renderMarketItems(selectedType);
-    saveToGist();
+    saveToFirebase();
     showToast(`${TYPE_META[selectedType].emoji} Posted and live!`);
   });
 
@@ -1236,8 +1221,9 @@ function switchTab(tabId) {
 ───────────────────────────────────── */
 
 async function init() {
-  // 1. Load data from Gist (or local cache, or hardcoded defaults)
-  await loadFromGist();
+  // 1. Load data from Firebase (or local cache, or hardcoded defaults)
+  await loadFromFirebase();
+  startListening(); // real-time updates for all devices
 
   // 2. Check for saved session in cookie
   const savedId = parseInt(getCookie('cbbank_me') || '');
