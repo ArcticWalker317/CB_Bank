@@ -46,10 +46,10 @@
       <div class="mkt-filter-bar" id="mktFilterBar">
         <button class="mkt-chip" data-filter="yours">Yours</button>
         <button class="mkt-chip" data-filter="open">Open</button>
-        <button class="mkt-chip" data-filter="bet">🎲 Bets</button>
-        <button class="mkt-chip" data-filter="bounty">🎯 Bounties</button>
-        <button class="mkt-chip" data-filter="quest">⚡ Quests</button>
-        <button class="mkt-chip" data-filter="offering">🎁 Offerings</button>
+        <button class="mkt-chip" data-filter="bet">Bets</button>
+        <button class="mkt-chip" data-filter="bounty">Bounties</button>
+        <button class="mkt-chip" data-filter="quest">Quests</button>
+        <button class="mkt-chip" data-filter="offering">Offerings</button>
       </div>
 
       <div class="mkt-feed" id="mktFeed"></div>
@@ -109,7 +109,11 @@
 
   </div><!-- /#app -->
 
-  <script src="config.js"></script><!-- gitignored: holds GITHUB_TOKEN -->
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script src="config.js"></script><!-- gitignored: holds Firebase config -->
   <script src="app.js"></script>
 </body>
 </html>
