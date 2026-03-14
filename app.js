@@ -576,6 +576,14 @@ function renderMarketFeed() {
   let items = all;
   if (state.mktFilter === 'yours') {
     items = all.filter(item => [item.postedBy, item.by, item.from, item.to].includes(ME));
+  } else if (state.mktFilter === 'open') {
+    items = all.filter(item => {
+      if (item._type === 'bounty')   return item.status !== 'claimed';
+      if (item._type === 'quest')    return item.status === 'live';
+      if (item._type === 'bet')      return item.status === 'open' && (item.from === ME || item.to === ME);
+      if (item._type === 'offering') return item.status === 'available' && item.by !== ME;
+      return false;
+    });
   } else if (state.mktFilter !== 'all') {
     items = all.filter(item => item._type === state.mktFilter);
   }
@@ -1248,8 +1256,15 @@ async function init() {
   document.getElementById('mktFilterBar').addEventListener('click', e => {
     const chip = e.target.closest('.mkt-chip');
     if (!chip) return;
-    state.mktFilter = chip.dataset.filter;
-    document.querySelectorAll('.mkt-chip').forEach(c => c.classList.toggle('active', c === chip));
+    // Toggle off if already active → back to 'all'
+    if (chip.classList.contains('active')) {
+      chip.classList.remove('active');
+      state.mktFilter = 'all';
+    } else {
+      document.querySelectorAll('.mkt-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.mktFilter = chip.dataset.filter;
+    }
     renderMarketFeed();
   });
 
