@@ -414,6 +414,11 @@ function renderAll() {
   if (sendBtn) {
     sendBtn.innerHTML = isAdmin() ? 'Mint <span class="cb-mark">ᴄʙ</span>' : 'Send <span class="cb-mark">ᴄʙ</span>';
   }
+  // Show current balance in market header offer button
+  const offerBtn = document.getElementById('btnOffer');
+  if (offerBtn && !isAdmin()) {
+    offerBtn.textContent = `${getMember(ME).balance} CB`;
+  }
 }
 
 /* ─────────────────────────────────────
