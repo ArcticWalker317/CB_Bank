@@ -120,22 +120,16 @@ const isAdmin  = () => ME === ADMIN_ID;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const TYPE_META = {
-  bounty:   { label: 'Bounties',  emoji: '🎯', desc: 'Complete a task, earn ᴄʙ',      cls: 'type-bounty'   },
-  quest:    { label: 'Quests',    emoji: '⚡', desc: 'Time-limited group challenges',  cls: 'type-quest'    },
-  bet:      { label: 'Bets',      emoji: '🎲', desc: 'Put ᴄʙ on the line',            cls: 'type-bet'      },
-  offering: { label: 'Offerings', emoji: '🎁', desc: 'Services for sale by members',  cls: 'type-offering' },
+  bounty:   { label: 'Bounties',  singular: 'Bounty',   emoji: '🎯', desc: 'Complete a task, earn ᴄʙ',      cls: 'type-bounty'   },
+  quest:    { label: 'Quests',    singular: 'Quest',    emoji: '⚡', desc: 'Time-limited group challenges',  cls: 'type-quest'    },
+  bet:      { label: 'Bets',      singular: 'Bet',      emoji: '🎲', desc: 'Put ᴄʙ on the line',            cls: 'type-bet'      },
+  offering: { label: 'Offerings', singular: 'Offering', emoji: '🎁', desc: 'Services for sale by members',  cls: 'type-offering' },
 };
 
 const state = {
-<<<<<<< HEAD
   tab:         'feed',
   mktFilter:   'all',
   chartPeriod: 'week',
-=======
-  tab:     'feed',
-  mktView: 'home',
-  mktType: null,
->>>>>>> bc13cbde0bc5ca6e282c7c81d142e7003504d36a
 };
 
 /* ─────────────────────────────────────
@@ -551,7 +545,7 @@ function buildFeedCard(item, type) {
       </div>`;
   }
 
-  const badge = `<span class="type-badge badge-${type}" style="margin-bottom:8px;display:inline-block">${meta.label.slice(0,-1)}</span>`;
+  const badge = `<span class="type-badge badge-${type}" style="margin-bottom:8px;display:inline-block">${meta.singular}</span>`;
   return `<div class="mkt-feed-card ${meta.cls}">${badge}${inner}</div>`;
 }
 
@@ -609,16 +603,9 @@ function renderMarketFeed() {
       if (action === 'award-quest')     openAdminResolveModal(item, 'quest');
       if (action === 'award-bounty')    openAdminResolveModal(item, 'bounty');
       if (action === 'remove-offering') {
-<<<<<<< HEAD
         appData.marketplace.offering.splice(appData.marketplace.offering.indexOf(item), 1);
         renderMarketFeed();
         saveToGist();
-=======
-        appData.marketplace.offering.splice(idx, 1);
-        renderMarketItems('offering');
-        renderMarketGrid();
-        saveToFirebase();
->>>>>>> bc13cbde0bc5ca6e282c7c81d142e7003504d36a
         showToast('Offering removed');
       }
     });
@@ -642,12 +629,7 @@ function handleBuyOffering(offeringId, price, sellerId) {
   });
 
   renderAll();
-<<<<<<< HEAD
   saveToGist();
-=======
-  showMarketList('offering');
-  saveToFirebase();
->>>>>>> bc13cbde0bc5ca6e282c7c81d142e7003504d36a
   showToast(`Bought "${item.title}" from ${getMember(sellerId).name}! 🎉`);
 }
 
@@ -1004,12 +986,7 @@ function openAdminResolveModal(item, type) {
         });
         closeModal();
         renderAll();
-<<<<<<< HEAD
         saveToGist();
-=======
-        if (state.mktView === 'list') renderMarketItems(state.mktType);
-        saveToFirebase();
->>>>>>> bc13cbde0bc5ca6e282c7c81d142e7003504d36a
         showToast(`${getMember(winnerId).name} wins the bet!`);
       });
     });
@@ -1037,12 +1014,7 @@ function openAdminResolveModal(item, type) {
       });
       closeModal();
       renderAll();
-<<<<<<< HEAD
       saveToGist();
-=======
-      if (state.mktView === 'list') renderMarketItems(state.mktType);
-      saveToFirebase();
->>>>>>> bc13cbde0bc5ca6e282c7c81d142e7003504d36a
       showToast(`${winner.name} awarded ${reward} ᴄʙ!`);
     });
   }
@@ -1119,7 +1091,7 @@ function openCreateModal(preType = null) {
     <div class="type-selector">
       ${Object.keys(TYPE_META).map(t => {
         const meta = TYPE_META[t];
-        return `<div class="type-option ${selectedType === t ? 'selected' : ''}" data-type="${t}">${meta.label.slice(0, -1)}</div>`;
+        return `<div class="type-option ${selectedType === t ? 'selected' : ''}" data-type="${t}">${meta.singular}</div>`;
       }).join('')}
     </div>
     <label class="modal-label">Title</label>
@@ -1153,14 +1125,8 @@ function openCreateModal(preType = null) {
 
     appData.marketplace[selectedType].unshift(newItem);
     closeModal();
-<<<<<<< HEAD
     renderMarketFeed();
     saveToGist();
-=======
-    renderMarketGrid();
-    if (state.mktView === 'list' && state.mktType === selectedType) renderMarketItems(selectedType);
-    saveToFirebase();
->>>>>>> bc13cbde0bc5ca6e282c7c81d142e7003504d36a
     showToast(`${TYPE_META[selectedType].emoji} Posted and live!`);
   });
 
