@@ -568,7 +568,7 @@ input, textarea, select { font: inherit; }
 .mkt-feed {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 14px calc(var(--nav-h) + var(--safe-b) + 88px);
+  padding: 12px 14px calc(var(--nav-h) + var(--safe-b) + 16px);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -592,16 +592,6 @@ input, textarea, select { font: inherit; }
 }
 .fab:active { transform: scale(0.91); box-shadow: 0 2px 8px var(--gold-glow); }
 
-.fab-float {
-  position: absolute;
-  bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
-  left: 0; right: 0;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 5;
-}
-.fab-float .fab { pointer-events: all; }
 
 /* ── Type accent colors (shared by feed cards) ── */
 .type-bounty::before   { background: var(--red);    }

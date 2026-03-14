@@ -1202,13 +1202,12 @@ async function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  document.getElementById('btnPost').addEventListener('click', () => openCreateModal());
+  document.getElementById('btnOffer').addEventListener('click', () => openCreateModal());
   document.getElementById('btnSend').addEventListener('click', () => {
     isAdmin() ? openAdminMintModal() : openSendModal();
   });
   document.getElementById('btnSignOut').addEventListener('click', signOut);
 
-  document.getElementById('btnCreate').addEventListener('click', () => openCreateModal());
 
   document.getElementById('mktFilterBar').addEventListener('click', e => {
     const chip = e.target.closest('.mkt-chip');
