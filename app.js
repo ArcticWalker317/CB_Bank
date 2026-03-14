@@ -1202,6 +1202,7 @@ async function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  document.getElementById('btnPost').addEventListener('click', () => openCreateModal());
   document.getElementById('btnSend').addEventListener('click', () => {
     isAdmin() ? openAdminMintModal() : openSendModal();
   });
