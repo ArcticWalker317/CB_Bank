@@ -545,8 +545,9 @@ function buildFeedCard(item, type) {
       </div>`;
   }
 
+  const isMine = [item.postedBy, item.by, item.from, item.to].includes(ME);
   const badge = `<span class="type-badge badge-${type}" style="margin-bottom:8px;display:inline-block">${meta.singular}</span>`;
-  return `<div class="mkt-feed-card ${meta.cls}">${badge}${inner}</div>`;
+  return `<div class="mkt-feed-card ${meta.cls}${isMine ? ' highlight' : ''}">${badge}${inner}</div>`;
 }
 
 function renderMarketFeed() {
