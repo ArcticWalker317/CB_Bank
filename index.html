@@ -39,32 +39,23 @@
     <!-- ── MARKETPLACE TAB ── -->
     <section id="tab-marketplace" class="tab-pane">
 
-      <div id="mkt-home">
-        <header class="page-header">
-          <h1 class="header-title">Marketplace</h1>
-        </header>
-        <div class="mkt-scroll-area">
-          <div id="mkt-grid" class="mkt-grid"></div>
-          <div class="fab-wrap">
-            <button class="fab" id="btnCreate">+</button>
-          </div>
-        </div>
+      <header class="page-header">
+        <h1 class="header-title">Marketplace</h1>
+      </header>
+
+      <div class="mkt-filter-bar" id="mktFilterBar">
+        <button class="mkt-chip active" data-filter="all">All</button>
+        <button class="mkt-chip" data-filter="yours">Yours</button>
+        <button class="mkt-chip" data-filter="bet">🎲 Bets</button>
+        <button class="mkt-chip" data-filter="bounty">🎯 Bounties</button>
+        <button class="mkt-chip" data-filter="quest">⚡ Quests</button>
+        <button class="mkt-chip" data-filter="offering">🎁 Offerings</button>
       </div>
 
-      <div id="mkt-list" class="hidden">
-        <header class="page-header">
-          <button class="btn-back" id="btnBack">
-            <svg width="10" height="17" viewBox="0 0 10 17" fill="none">
-              <path d="M9 1L1 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <h1 class="header-title" id="list-title">Bounties</h1>
-          <div class="header-spacer"></div>
-        </header>
-        <div id="mkt-items" class="mkt-items"></div>
-        <div class="fab-float">
-          <button class="fab" id="btnCreateList">+</button>
-        </div>
+      <div class="mkt-feed" id="mktFeed"></div>
+
+      <div class="fab-float">
+        <button class="fab" id="btnCreate">+</button>
       </div>
 
     </section>

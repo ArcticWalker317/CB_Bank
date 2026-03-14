@@ -143,8 +143,7 @@ const TYPE_META = {
 
 const state = {
   tab:         'feed',
-  mktView:     'home',
-  mktType:     null,
+  mktFilter:   'all',
   chartPeriod: 'week',
 };
 
@@ -367,9 +366,8 @@ function showLoginScreen() {
 function signOut() {
   deleteCookie('cbbank_me');
   ME = null;
-  state.tab     = 'feed';
-  state.mktView = 'home';
-  state.mktType = null;
+  state.tab       = 'feed';
+  state.mktFilter = 'all';
 
   // Reset tab UI
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -425,7 +423,7 @@ function cbNum(n, sign = '') {
 function renderAll() {
   renderMembersStrip();
   renderFeed();
-  renderMarketGrid();
+  renderMarketFeed();
   renderProfile();
   // Swap feed header button for admin
   const sendBtn = document.getElementById('btnSend');
@@ -492,133 +490,129 @@ function renderFeed() {
    MARKETPLACE
 ───────────────────────────────────── */
 
-function renderMarketGrid() {
-  document.getElementById('mkt-grid').innerHTML = Object.keys(TYPE_META).map((type, i) => {
-    const meta  = TYPE_META[type];
-    const count = appData.marketplace[type]?.length ?? 0;
-    return `
-      <div class="mkt-type-card ${meta.cls}" data-type="${type}" style="animation-delay:${i * 0.08}s">
-        <div class="mkt-count">${count}</div>
-        <div class="mkt-type-icon">${meta.emoji}</div>
-        <div class="mkt-type-name">${meta.label}</div>
-        <div class="mkt-type-desc">${meta.desc}</div>
+function buildFeedCard(item, type) {
+  const meta   = TYPE_META[type];
+  const adminBtn = (label, dataAttr) =>
+    isAdmin() ? `<button class="admin-action-btn" ${dataAttr}>${label}</button>` : '';
+
+  let inner = '';
+
+  if (type === 'bounty') {
+    const poster = getMember(item.postedBy);
+    inner = `
+      <div class="mkt-item-header">
+        <div class="mkt-item-title">${item.title}</div>
+        <div class="mkt-item-amount">${cbNum(item.reward)}</div>
       </div>
-    `;
-  }).join('');
+      <div class="mkt-item-footer">
+        <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
+        ${item.status !== 'claimed'
+          ? adminBtn('🏆 Award', `data-admin-action="award-bounty" data-type="bounty" data-id="${item.id}"`)
+          : `<span class="status-tag status-claimed">claimed</span>`}
+      </div>`;
 
-  document.querySelectorAll('.mkt-type-card').forEach(card => {
-    card.addEventListener('click', () => showMarketList(card.dataset.type));
+  } else if (type === 'quest') {
+    const poster = getMember(item.postedBy);
+    inner = `
+      <div class="mkt-item-header">
+        <div class="mkt-item-title">${item.title}</div>
+        <div class="mkt-item-amount">${cbNum(item.reward)}</div>
+      </div>
+      <div class="mkt-item-footer">
+        <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span class="deadline-tag">⏱ ${item.deadline}</span></div>
+        ${item.status === 'live'
+          ? adminBtn('🏆 Award', `data-admin-action="award-quest" data-type="quest" data-id="${item.id}"`)
+          : `<span class="status-tag status-${item.status}">${item.status}</span>`}
+      </div>`;
+
+  } else if (type === 'bet') {
+    const fromM = getMember(item.from);
+    const toM   = getMember(item.to);
+    const adjM  = getMember(item.adjudicator);
+    inner = `
+      <div class="mkt-item-header">
+        <div class="mkt-item-title">${item.title}</div>
+        <div class="mkt-item-amount">${cbNum(item.amount)}</div>
+      </div>
+      <div class="mkt-item-footer">
+        <div class="mkt-item-by">${miniAvatarDiv(fromM)}<span>${fromM.name}</span><span class="vs-divider">vs</span>${miniAvatarDiv(toM)}<span>${toM.name}</span></div>
+        ${item.status === 'open'
+          ? adminBtn('⚖️ Resolve', `data-admin-action="resolve-bet" data-type="bet" data-id="${item.id}"`)
+          : `<span class="status-tag status-${item.status}">${item.status}</span>`}
+      </div>
+      <div class="adj-tag">Judge: ${adjM.name} · ${item.time}</div>`;
+
+  } else if (type === 'offering') {
+    const byM  = getMember(item.by);
+    const isMe = item.by === ME;
+    inner = `
+      <div class="mkt-item-header">
+        <div class="mkt-item-title">${item.title}</div>
+        <div class="mkt-item-amount">${cbNum(item.price)}</div>
+      </div>
+      <div class="mkt-item-footer">
+        <div class="mkt-item-by">${miniAvatarDiv(byM)}<span>${isMe && !isAdmin() ? 'You' : byM.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
+        ${isAdmin()
+          ? adminBtn('🗑 Remove', `data-admin-action="remove-offering" data-type="offering" data-id="${item.id}"`)
+          : isMe
+            ? '<span class="status-tag status-yours">yours</span>'
+            : `<button class="buy-btn" data-id="${item.id}" data-price="${item.price}" data-by="${item.by}">Buy</button>`
+        }
+      </div>`;
+  }
+
+  const badge = `<span class="type-badge badge-${type}" style="margin-bottom:8px;display:inline-block">${meta.emoji} ${meta.label.slice(0,-1)}</span>`;
+  return `<div class="mkt-feed-card ${meta.cls}">${badge}${inner}</div>`;
+}
+
+function renderMarketFeed() {
+  // Flatten all items with type tag
+  const all = [];
+  Object.keys(TYPE_META).forEach(type => {
+    (appData.marketplace[type] || []).forEach(item => all.push({ ...item, _type: type }));
   });
-}
 
-function showMarketList(type) {
-  state.mktView = 'list';
-  state.mktType = type;
-  document.getElementById('list-title').textContent = TYPE_META[type].label;
-  document.getElementById('mkt-home').classList.add('hidden');
-  document.getElementById('mkt-list').classList.remove('hidden');
-  renderMarketItems(type);
-}
+  // Filter
+  let items = all;
+  if (state.mktFilter === 'yours') {
+    items = all.filter(item => [item.postedBy, item.by, item.from, item.to].includes(ME));
+  } else if (state.mktFilter !== 'all') {
+    items = all.filter(item => item._type === state.mktFilter);
+  }
 
-function renderMarketItems(type) {
-  const items = appData.marketplace[type] || [];
-  const el    = document.getElementById('mkt-items');
+  // Sort newest first
+  items.sort((a, b) => (b.time || '').localeCompare(a.time || ''));
 
+  const feed = document.getElementById('mktFeed');
   if (!items.length) {
-    el.innerHTML = `<div class="empty-state">No ${type}s yet.<br>Be the first to post one!</div>`;
+    feed.innerHTML = `<div class="empty-state">Nothing here yet.</div>`;
     return;
   }
 
-  el.innerHTML = items.map((item, i) => {
-    let inner = '';
+  feed.innerHTML = items.map((item, i) =>
+    `<div style="animation-delay:${i * 0.05}s">${buildFeedCard(item, item._type)}</div>`
+  ).join('');
 
-    const adminBtn = (label, dataAttr) =>
-      isAdmin() ? `<button class="admin-action-btn" ${dataAttr}>${label}</button>` : '';
-
-    if (type === 'bounty') {
-      const poster = getMember(item.postedBy);
-      inner = `
-        <div class="mkt-item-header">
-          <div class="mkt-item-title">${item.title}</div>
-          <div class="mkt-item-amount">${cbNum(item.reward)}</div>
-        </div>
-        <div class="mkt-item-footer">
-          <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
-          ${item.status !== 'claimed'
-            ? adminBtn('🏆 Award', `data-admin-action="award-bounty" data-idx="${appData.marketplace.bounty.indexOf(item)}"`)
-            : `<span class="status-tag status-claimed">claimed</span>`}
-        </div>`;
-
-    } else if (type === 'quest') {
-      const poster = getMember(item.postedBy);
-      inner = `
-        <div class="mkt-item-header">
-          <div class="mkt-item-title">${item.title}</div>
-          <div class="mkt-item-amount">${cbNum(item.reward)}</div>
-        </div>
-        <div class="mkt-item-footer">
-          <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span class="deadline-tag">⏱ ${item.deadline}</span></div>
-          ${item.status === 'live'
-            ? adminBtn('🏆 Award', `data-admin-action="award-quest" data-idx="${appData.marketplace.quest.indexOf(item)}"`)
-            : `<span class="status-tag status-${item.status}">${item.status}</span>`}
-        </div>`;
-
-    } else if (type === 'bet') {
-      const fromM = getMember(item.from);
-      const toM   = getMember(item.to);
-      const adjM  = getMember(item.adjudicator);
-      inner = `
-        <div class="mkt-item-header">
-          <div class="mkt-item-title">${item.title}</div>
-          <div class="mkt-item-amount">${cbNum(item.amount)}</div>
-        </div>
-        <div class="mkt-item-footer">
-          <div class="mkt-item-by">${miniAvatarDiv(fromM)}<span>${fromM.name}</span><span class="vs-divider">vs</span>${miniAvatarDiv(toM)}<span>${toM.name}</span></div>
-          ${item.status === 'open'
-            ? adminBtn('⚖️ Resolve', `data-admin-action="resolve-bet" data-idx="${appData.marketplace.bet.indexOf(item)}"`)
-            : `<span class="status-tag status-${item.status}">${item.status}</span>`}
-        </div>
-        <div class="adj-tag">Judge: ${adjM.name} · ${item.time}</div>`;
-
-    } else if (type === 'offering') {
-      const byM  = getMember(item.by);
-      const isMe = item.by === ME;
-      inner = `
-        <div class="mkt-item-header">
-          <div class="mkt-item-title">${item.title}</div>
-          <div class="mkt-item-amount">${cbNum(item.price)}</div>
-        </div>
-        <div class="mkt-item-footer">
-          <div class="mkt-item-by">${miniAvatarDiv(byM)}<span>${isMe && !isAdmin() ? 'You' : byM.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
-          ${isAdmin()
-            ? adminBtn('🗑 Remove', `data-admin-action="remove-offering" data-idx="${appData.marketplace.offering.indexOf(item)}"`)
-            : isMe
-              ? '<span class="status-tag status-yours">yours</span>'
-              : `<button class="buy-btn" data-id="${item.id}" data-price="${item.price}" data-by="${item.by}">Buy</button>`
-          }
-        </div>`;
-    }
-
-    return `<div class="mkt-item-card" style="animation-delay:${i * 0.05}s">${inner}</div>`;
-  }).join('');
-
-  el.querySelectorAll('.buy-btn').forEach(btn => {
+  feed.querySelectorAll('.buy-btn').forEach(btn => {
     btn.addEventListener('click', () =>
       handleBuyOffering(btn.dataset.id, parseInt(btn.dataset.price), parseInt(btn.dataset.by))
     );
   });
 
-  el.querySelectorAll('.admin-action-btn').forEach(btn => {
+  feed.querySelectorAll('.admin-action-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const action = btn.dataset.adminAction;
-      const idx    = parseInt(btn.dataset.idx);
-      if (action === 'resolve-bet')    openAdminResolveModal(appData.marketplace.bet[idx],    'bet');
-      if (action === 'award-quest')    openAdminResolveModal(appData.marketplace.quest[idx],  'quest');
-      if (action === 'award-bounty')   openAdminResolveModal(appData.marketplace.bounty[idx], 'bounty');
+      const type   = btn.dataset.type;
+      const id     = btn.dataset.id;
+      const list   = appData.marketplace[type];
+      const item   = list.find(x => String(x.id) === id);
+      if (!item) return;
+      if (action === 'resolve-bet')     openAdminResolveModal(item, 'bet');
+      if (action === 'award-quest')     openAdminResolveModal(item, 'quest');
+      if (action === 'award-bounty')    openAdminResolveModal(item, 'bounty');
       if (action === 'remove-offering') {
-        appData.marketplace.offering.splice(idx, 1);
-        renderMarketItems('offering');
-        renderMarketGrid();
+        appData.marketplace.offering.splice(appData.marketplace.offering.indexOf(item), 1);
+        renderMarketFeed();
         saveToGist();
         showToast('Offering removed');
       }
@@ -643,7 +637,6 @@ function handleBuyOffering(offeringId, price, sellerId) {
   });
 
   renderAll();
-  showMarketList('offering');
   saveToGist();
   showToast(`Bought "${item.title}" from ${getMember(sellerId).name}! 🎉`);
 }
@@ -1031,7 +1024,6 @@ function openAdminResolveModal(item, type) {
         });
         closeModal();
         renderAll();
-        if (state.mktView === 'list') renderMarketItems(state.mktType);
         saveToGist();
         showToast(`${getMember(winnerId).name} wins the bet!`);
       });
@@ -1060,7 +1052,6 @@ function openAdminResolveModal(item, type) {
       });
       closeModal();
       renderAll();
-      if (state.mktView === 'list') renderMarketItems(state.mktType);
       saveToGist();
       showToast(`${winner.name} awarded ${reward} ᴄʙ!`);
     });
@@ -1172,8 +1163,7 @@ function openCreateModal(preType = null) {
 
     appData.marketplace[selectedType].unshift(newItem);
     closeModal();
-    renderMarketGrid();
-    if (state.mktView === 'list' && state.mktType === selectedType) renderMarketItems(selectedType);
+    renderMarketFeed();
     saveToGist();
     showToast(`${TYPE_META[selectedType].emoji} Posted and live!`);
   });
@@ -1215,19 +1205,12 @@ function showToast(msg) {
 function switchTab(tabId) {
   if (state.tab === tabId) return;
   state.tab = tabId;
-  // Reset marketplace to home grid whenever leaving or entering it
-  if (state.mktView === 'list') {
-    state.mktView = 'home';
-    state.mktType = null;
-    document.getElementById('mkt-home').classList.remove('hidden');
-    document.getElementById('mkt-list').classList.add('hidden');
-  }
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   const pane = document.getElementById(`tab-${tabId}`);
   pane.classList.add('active');
   pane.scrollTop = 0;
-  pane.querySelectorAll('.feed-list, .mkt-scroll-area, .mkt-items, .profile-body').forEach(el => { el.scrollTop = 0; });
+  pane.querySelectorAll('.feed-list, .mkt-feed, .profile-body').forEach(el => { el.scrollTop = 0; });
   document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
 }
 
@@ -1260,15 +1243,15 @@ async function init() {
   });
   document.getElementById('btnSignOut').addEventListener('click', signOut);
 
-  document.getElementById('btnBack').addEventListener('click', () => {
-    state.mktView = 'home';
-    state.mktType = null;
-    document.getElementById('mkt-home').classList.remove('hidden');
-    document.getElementById('mkt-list').classList.add('hidden');
-  });
-
   document.getElementById('btnCreate').addEventListener('click', () => openCreateModal());
-  document.getElementById('btnCreateList').addEventListener('click', () => openCreateModal(state.mktType));
+
+  document.getElementById('mktFilterBar').addEventListener('click', e => {
+    const chip = e.target.closest('.mkt-chip');
+    if (!chip) return;
+    state.mktFilter = chip.dataset.filter;
+    document.querySelectorAll('.mkt-chip').forEach(c => c.classList.toggle('active', c === chip));
+    renderMarketFeed();
+  });
 
   document.getElementById('modal-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('modal-overlay')) closeModal();

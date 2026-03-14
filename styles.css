@@ -528,96 +528,52 @@ input, textarea, select { font: inherit; }
 
 #tab-marketplace { position: relative; }
 
-#mkt-home, #mkt-list {
+/* ── Filter Chip Bar ── */
+.mkt-filter-bar {
   display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-  min-height: 0;
+  gap: 8px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
+.mkt-filter-bar::-webkit-scrollbar { display: none; }
 
-.mkt-scroll-area {
+.mkt-chip {
+  flex-shrink: 0;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 5px 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray1);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.mkt-chip.active {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold-txt);
+}
+.mkt-chip:active { opacity: 0.7; }
+
+/* ── Unified Feed ── */
+.mkt-feed {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
+  padding: 12px 14px calc(var(--nav-h) + var(--safe-b) + 88px);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.mkt-scroll-area::-webkit-scrollbar { display: none; }
-
-/* ── Market Grid (2×2) ── */
-.mkt-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 11px;
-  padding: 14px 14px 0;
-}
-
-.mkt-type-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 20px 14px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  cursor: pointer;
-  transition: transform 0.12s, background 0.12s, box-shadow 0.12s;
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.mkt-type-card:active { transform: scale(0.96); background: var(--s2); }
-
-.mkt-type-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3.5px;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-}
-.type-bounty::before   { background: var(--red);    }
-.type-quest::before    { background: var(--green);  }
-.type-bet::before      { background: var(--purple); }
-.type-offering::before { background: var(--blue);   }
-
-.type-bounty   { border-color: rgba(192,57,43,0.16);  }
-.type-quest    { border-color: rgba(30,122,58,0.16);   }
-.type-bet      { border-color: rgba(122,56,176,0.16);  }
-.type-offering { border-color: rgba(26,95,170,0.16);   }
-
-.mkt-type-icon  { font-size: 30px; line-height: 1; margin-top: 4px; }
-.mkt-type-name  {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: var(--white);
-}
-.mkt-type-desc  { font-size: 11.5px; color: var(--gray1); line-height: 1.4; }
-.mkt-count {
-  position: absolute;
-  top: 11px; right: 12px;
-  background: var(--s2);
-  color: var(--gray1);
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 50px;
-  min-width: 22px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
+.mkt-feed::-webkit-scrollbar { display: none; }
 
 /* ── FAB ── */
-.fab-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 22px 0 8px;
-}
 .fab {
   width: 56px;
   height: 56px;
@@ -635,18 +591,6 @@ input, textarea, select { font: inherit; }
 }
 .fab:active { transform: scale(0.91); box-shadow: 0 2px 8px var(--gold-glow); }
 
-/* ── Market List View ── */
-#mkt-list { position: relative; }
-
-.mkt-items {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 14px calc(var(--nav-h) + var(--safe-b) + 88px);
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.mkt-items::-webkit-scrollbar { display: none; }
-
 .fab-float {
   position: absolute;
   bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
@@ -658,7 +602,36 @@ input, textarea, select { font: inherit; }
 }
 .fab-float .fab { pointer-events: all; }
 
-/* ── Market Item Cards ── */
+/* ── Type accent colors (shared by feed cards) ── */
+.type-bounty::before   { background: var(--red);    }
+.type-quest::before    { background: var(--green);  }
+.type-bet::before      { background: var(--purple); }
+.type-offering::before { background: var(--blue);   }
+
+.type-bounty   { border-color: rgba(192,57,43,0.16);  }
+.type-quest    { border-color: rgba(30,122,58,0.16);   }
+.type-bet      { border-color: rgba(122,56,176,0.16);  }
+.type-offering { border-color: rgba(26,95,170,0.16);   }
+
+/* ── Market Feed Cards ── */
+.mkt-feed-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.035);
+  position: relative;
+  overflow: hidden;
+}
+.mkt-feed-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+/* ── Market Item Card layout (shared) ── */
 .mkt-item-card {
   background: var(--s1);
   border: 1px solid var(--border);
@@ -1401,6 +1374,5 @@ input, textarea, select { font: inherit; }
 }
 
 .feed-card     { animation: fadeUp 0.22s ease both; }
-.mkt-item-card { animation: fadeUp 0.2s ease both;  }
-.mkt-type-card { animation: fadeUp 0.2s ease both;  }
+.mkt-feed-card { animation: fadeUp 0.2s ease both;  }
 .offering-row  { animation: fadeUp 0.18s ease both; }
