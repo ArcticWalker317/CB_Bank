@@ -746,13 +746,13 @@ function renderProfile() {
       <svg class="lc-svg" viewBox="0 0 ${VW} ${VH}">
         <defs>
           <linearGradient id="lcg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#F5C542" stop-opacity="0.3"/>
-            <stop offset="100%" stop-color="#F5C542" stop-opacity="0"/>
+            <stop offset="0%"   stop-color="#18181b" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#18181b" stop-opacity="0"/>
           </linearGradient>
         </defs>
         <polygon points="${area}" fill="url(#lcg)"/>
-        <polyline points="${pts}" fill="none" stroke="#F5C542" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        <circle cx="${lx}" cy="${ly}" r="3.5" fill="#F5C542"/>
+        <polyline points="${pts}" fill="none" stroke="#18181b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="${lx}" cy="${ly}" r="3.5" fill="#18181b"/>
         ${xLabels}
       </svg>`;
   }
