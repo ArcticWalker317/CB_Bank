@@ -94,8 +94,16 @@ input, textarea, select { font: inherit; }
 @media (min-width: 430px) {
   body { display: flex; justify-content: center; background: var(--secondary); }
   #app { max-width: 430px; width: 100%; border: 1px solid var(--border); box-shadow: var(--shadow-md); }
-  #screen-login { max-width: 430px; left: 50%; transform: translateX(-50%); }
-  #screen-login.fade-out { transform: translateX(-50%) scale(0.97); }
+  /* Fix: inset:0 sets right:0 too, so we must override right + width explicitly */
+  #screen-login {
+    left: 50%;
+    right: auto;
+    width: 430px;
+    transform: translateX(-50%);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+  }
+  #screen-login.fade-out { transform: translateX(-50%) scale(0.97); opacity: 0; pointer-events: none; }
 }
 
 /* ═══════════════════════════════════════

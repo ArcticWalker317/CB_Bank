@@ -114,7 +114,7 @@ let appData = JSON.parse(JSON.stringify(DEFAULT_DATA));     // live data (deep c
    CONSTANTS
 ───────────────────────────────────── */
 
-const BANK  = { name: 'Bank',  initials: 'ᴄʙ',  color: '#F5C542' };
+const BANK  = { name: 'Bank',  initials: 'ᴄʙ',  color: '#18181b' };
 const ADMIN_ID = 0; // special id — not in members array
 const isAdmin  = () => ME === ADMIN_ID;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -494,7 +494,7 @@ function buildFeedCard(item, type) {
         <div class="mkt-item-amount">${cbNum(item.reward)}</div>
       </div>
       <div class="mkt-item-footer">
-        <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
+        <div class="mkt-item-by">${miniAvatarDiv(poster)}<span>${poster.name}</span><span style="color:var(--muted-foreground)">· ${item.time}</span></div>
         ${item.status !== 'claimed'
           ? adminBtn('🏆 Award', `data-admin-action="award-bounty" data-type="bounty" data-id="${item.id}"`)
           : `<span class="status-tag status-claimed">claimed</span>`}
@@ -540,7 +540,7 @@ function buildFeedCard(item, type) {
         <div class="mkt-item-amount">${cbNum(item.price)}</div>
       </div>
       <div class="mkt-item-footer">
-        <div class="mkt-item-by">${miniAvatarDiv(byM)}<span>${isMe && !isAdmin() ? 'You' : byM.name}</span><span style="color:var(--gray2)">· ${item.time}</span></div>
+        <div class="mkt-item-by">${miniAvatarDiv(byM)}<span>${isMe && !isAdmin() ? 'You' : byM.name}</span><span style="color:var(--muted-foreground)">· ${item.time}</span></div>
         ${isAdmin()
           ? adminBtn('🗑 Remove', `data-admin-action="remove-offering" data-type="offering" data-id="${item.id}"`)
           : isMe
@@ -611,7 +611,7 @@ function renderMarketFeed() {
       if (action === 'remove-offering') {
         appData.marketplace.offering.splice(appData.marketplace.offering.indexOf(item), 1);
         renderMarketFeed();
-        saveToGist();
+        saveToFirebase();
         showToast('Offering removed');
       }
     });
@@ -635,7 +635,7 @@ function handleBuyOffering(offeringId, price, sellerId) {
   });
 
   renderAll();
-  saveToGist();
+  saveToFirebase();
   showToast(`Bought "${item.title}" from ${getMember(sellerId).name}! 🎉`);
 }
 
@@ -948,11 +948,11 @@ function openAdminResolveModal(item, type) {
       <div style="font-size:15px;font-weight:600;margin-bottom:20px;line-height:1.4">${item.title}</div>
       <label class="modal-label">Who wins ${cbNum(item.amount)}?</label>
       <div style="display:flex;gap:10px;margin-bottom:20px">
-        <button class="resolve-btn" data-winner="${item.from}" style="flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;font-size:14px;font-weight:700;color:var(--white);transition:all .15s">
-          ${avatarDiv(fromM, 36)}<span style="margin-top:6px;display:block">${fromM.name}</span>
+        <button class="resolve-btn" data-winner="${item.from}" style="flex:1;background:var(--secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;font-size:14px;font-weight:700;color:var(--foreground);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          ${avatarDiv(fromM, 36)}<span>${fromM.name}</span>
         </button>
-        <button class="resolve-btn" data-winner="${item.to}" style="flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;font-size:14px;font-weight:700;color:var(--white);transition:all .15s">
-          ${avatarDiv(toM, 36)}<span style="margin-top:6px;display:block">${toM.name}</span>
+        <button class="resolve-btn" data-winner="${item.to}" style="flex:1;background:var(--secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;font-size:14px;font-weight:700;color:var(--foreground);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          ${avatarDiv(toM, 36)}<span>${toM.name}</span>
         </button>
       </div>
     `;
@@ -992,7 +992,7 @@ function openAdminResolveModal(item, type) {
         });
         closeModal();
         renderAll();
-        saveToGist();
+        saveToFirebase();
         showToast(`${getMember(winnerId).name} wins the bet!`);
       });
     });
@@ -1020,7 +1020,7 @@ function openAdminResolveModal(item, type) {
       });
       closeModal();
       renderAll();
-      saveToGist();
+      saveToFirebase();
       showToast(`${winner.name} awarded ${reward} ᴄʙ!`);
     });
   }
@@ -1132,7 +1132,7 @@ function openCreateModal(preType = null) {
     appData.marketplace[selectedType].unshift(newItem);
     closeModal();
     renderMarketFeed();
-    saveToGist();
+    saveToFirebase();
     showToast(`${TYPE_META[selectedType].emoji} Posted and live!`);
   });
 
