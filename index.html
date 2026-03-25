@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ᴄʙ Bank">
-  <meta name="theme-color" content="#0A0A0A">
+  <meta name="theme-color" content="#ffffff">
   <title>ᴄʙ Bank</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -39,33 +39,21 @@
     <!-- ── MARKETPLACE TAB ── -->
     <section id="tab-marketplace" class="tab-pane">
 
-      <div id="mkt-home">
-        <header class="page-header">
-          <h1 class="header-title">Marketplace</h1>
-        </header>
-        <div class="mkt-scroll-area">
-          <div id="mkt-grid" class="mkt-grid"></div>
-          <div class="fab-wrap">
-            <button class="fab" id="btnCreate">+</button>
-          </div>
-        </div>
+      <header class="page-header">
+        <h1 class="header-title">Marketplace</h1>
+        <button class="btn-ghost" id="btnOffer">— CB</button>
+      </header>
+
+      <div class="mkt-filter-bar" id="mktFilterBar">
+        <button class="mkt-chip" data-filter="yours">Yours</button>
+        <button class="mkt-chip" data-filter="open">Open</button>
+        <button class="mkt-chip" data-filter="bet">Bets</button>
+        <button class="mkt-chip" data-filter="bounty">Bounties</button>
+        <button class="mkt-chip" data-filter="quest">Quests</button>
+        <button class="mkt-chip" data-filter="offering">Offerings</button>
       </div>
 
-      <div id="mkt-list" class="hidden">
-        <header class="page-header">
-          <button class="btn-back" id="btnBack">
-            <svg width="10" height="17" viewBox="0 0 10 17" fill="none">
-              <path d="M9 1L1 8.5L9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <h1 class="header-title" id="list-title">Bounties</h1>
-          <div class="header-spacer"></div>
-        </header>
-        <div id="mkt-items" class="mkt-items"></div>
-        <div class="fab-float">
-          <button class="fab" id="btnCreateList">+</button>
-        </div>
-      </div>
+      <div class="mkt-feed" id="mktFeed"></div>
 
     </section>
 
